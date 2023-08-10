@@ -25,3 +25,10 @@ jobs:
           context: .
           push: true
           tags: winsphinx/toolbox:latest
+
+      - name: Docker Hub Description
+        uses: peter-evans/dockerhub-description@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+          repository: winsphinx/toolbox
