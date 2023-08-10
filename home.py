@@ -10,8 +10,8 @@ from reversepolarity import Reversepolarity
 
 
 def index():
-    put_buttons(["轮选组脚本生成器"], [lambda: go_app("callgroup")])
-    put_buttons(["反极性脚本生成器"], [lambda: go_app("reversepolarity")])
+    put_buttons("轮选组脚本生成器", onclick=lambda: go_app("callgroup"))
+    put_buttons("反极性脚本生成器", onclick=lambda: go_app("reversepolarity"))
 
 
 def callgroup():
