@@ -2,8 +2,8 @@
 
 # 七零八落工具箱
 
-## 部署
+## Docker 部署
 
 ```sh
-docker run -d --name=toolbox -p 7086:7086 winsphinx/toolbox
+docker run -d --name=toolbox -p 7086:7086 winsphinx/toolbox:latest
 ```
