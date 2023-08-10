@@ -57,4 +57,5 @@ class Callgroup:
         put_markdown("**重要提醒：两个 SSS 都要加一遍。**")
 
 
-# main = Callgroup()
+if __name__ == "__main__":
+    main = Callgroup()
