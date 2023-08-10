@@ -3,7 +3,6 @@
 
 import re
 
-from pywebio import start_server
 from pywebio.output import put_button, put_file, put_markdown, put_scope, put_text, use_scope
 from pywebio.pin import pin, put_input, put_textarea
 
@@ -58,5 +57,4 @@ class Callgroup:
         put_markdown("**重要提醒：两个 SSS 都要加一遍。**")
 
 
-# main=Call()
-# start_server(main, port=7086)
+# main = Callgroup()
