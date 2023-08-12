@@ -52,4 +52,4 @@ class Reversepolarity:
 
 
 if __name__ == "__main__":
-    main = Reversepolarity()
+    Reversepolarity()

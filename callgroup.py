@@ -58,4 +58,4 @@ class Callgroup:
 
 
 if __name__ == "__main__":
-    main = Callgroup()
+    Callgroup()
