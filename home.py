@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from random import choice
+
 from pywebio import start_server
 from pywebio.output import put_button, put_markdown
 from pywebio.session import go_app
@@ -12,8 +14,9 @@ from reversepolarity import Reversepolarity
 def index():
     put_markdown("# 七零八落工具箱")
 
-    put_button("轮选组脚本生成器", onclick=lambda: go_app("callgroup"))
-    put_button("反极性脚本生成器", onclick=lambda: go_app("reversepolarity"))
+    colors = ["primary", "secondary", "success", "danger", "warning", "info", "light", "dark"]
+    put_button("轮选组脚本生成器", onclick=lambda: go_app("callgroup"), color=choice(colors))
+    put_button("反极性脚本生成器", onclick=lambda: go_app("reversepolarity"), color=choice(colors))
 
 
 def callgroup():
