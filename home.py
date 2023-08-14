@@ -9,6 +9,7 @@ from pywebio.session import go_app
 
 from callgroup import Callgroup
 from reversepolarity import Reversepolarity
+from ipcal import IPcal
 
 
 def index():
@@ -17,14 +18,27 @@ def index():
     colors = ["primary", "secondary", "success", "danger", "warning", "info", "light", "dark"]
     put_button("轮选组脚本生成器", onclick=lambda: go_app("callgroup"), color=choice(colors))
     put_button("反极性脚本生成器", onclick=lambda: go_app("reversepolarity"), color=choice(colors))
+    put_button("IP 地址计算器", onclick=lambda: go_app("ipcal"), color=choice(colors))
 
 
 def callgroup():
-    cg = Callgroup()
+    Callgroup()
 
 
 def reversepolarity():
-    rp = Reversepolarity()
+    Reversepolarity()
 
 
-start_server([index, callgroup, reversepolarity], port=7086)
+def ipcal():
+    IPcal()
+
+
+start_server(
+    [
+        index,
+        callgroup,
+        reversepolarity,
+        ipcal,
+    ],
+    port=7086,
+)
