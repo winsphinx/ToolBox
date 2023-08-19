@@ -40,5 +40,6 @@ start_server(
         reversepolarity,
         ipcal,
     ],
+    host="127.0.0.1",
     port=7086,
 )
