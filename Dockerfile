@@ -1,9 +1,11 @@
 FROM python:alpine
 
-RUN python3 -m pip install -U --no-cache-dir pip pywebio
-
 WORKDIR /app
 
-ADD *.py ./
+COPY src/ ./
 
-CMD ["python3", "/app/home.py"]
+RUN pip install --no-cache-dir -r requirements.txt
+
+EXPOSE 7086
+
+CMD ["python3", "./index.py"]

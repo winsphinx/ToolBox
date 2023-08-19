@@ -6,5 +6,5 @@
 ## Docker
 
 ```sh
-docker run -d --name=toolbox -p 7086:7086 ghcr.io/winsphinx/toolbox:latest
+docker run -d --name=toolbox --rm -p 7086:7086 ghcr.io/winsphinx/toolbox:latest
 ```
