@@ -24,26 +24,30 @@ class IPcal:
 
     @use_scope("output", clear=True)
     def update(self):
-        interface = ipaddress.ip_interface(pin["ip"])
-        content = f"它的网络地址是：{interface.network}\n"
+        try:
+            interface = ipaddress.ip_interface(pin["ip"])
+            content = f"它的网络地址是：{interface.network}\n"
 
-        network = interface.network
+            network = interface.network
 
-        if network.version == 4:
-            content += f"它的广播地址是：{network.broadcast_address}\n"
-            content += f"它的网络掩码是：{network.netmask}\n"
-            content += f"它的主机掩码是：{network.hostmask}\n"
+            if network.version == 4:
+                content += f"它的广播地址是：{network.broadcast_address}\n"
+                content += f"它的网络掩码是：{network.netmask}\n"
+                content += f"它的主机掩码是：{network.hostmask}\n"
 
-        elif network.version == 6:
-            content += f"它的压缩地址是：{network.compressed}\n"
-            content += f"它的扩展地址是：{network.exploded}\n"
+            elif network.version == 6:
+                content += f"它的压缩地址是：{network.compressed}\n"
+                content += f"它的扩展地址是：{network.exploded}\n"
 
-        content += f"它的地址数量有：{network.num_addresses} 个\n它的可用地址有：\n"
-        hosts = [str(x) for x in list(network.hosts())]
-        if len(hosts) > 10:
-            hosts = hosts[:5] + ["......"] + hosts[-5:]
+            content += f"它的地址数量有：{network.num_addresses} 个\n它的可用地址有：\n"
+            hosts = [str(x) for x in list(network.hosts())]
+            if len(hosts) > 10:
+                hosts = hosts[:5] + ["......"] + hosts[-5:]
 
-        content += f"{hosts}"
+            content += f"{hosts}"
+
+        except ValueError:
+            content = "这不是一个有效的 IP 地址。"
 
         put_text(content)
 
