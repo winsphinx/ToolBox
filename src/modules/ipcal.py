@@ -2,10 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import ipaddress
-import re
-import time
 
-from pywebio import start_server
 from pywebio.output import put_button, put_markdown, put_scope, put_text, use_scope
 from pywebio.pin import pin, put_input
 
