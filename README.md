@@ -1,3 +1,4 @@
+[![Check and Lint](https://github.com/winsphinx/Toolbox/actions/workflows/check.yml/badge.svg)](https://github.com/winsphinx/Toolbox/actions/workflows/check.yml)
 [![Build and Push Docker Image](https://github.com/winsphinx/toolbox/actions/workflows/docker.yml/badge.svg)](https://github.com/winsphinx/toolbox/actions/workflows/docker.yml)
 
 # 7086 Tool Box
