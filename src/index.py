@@ -33,13 +33,18 @@ def ipcal():
     IPcal()
 
 
-start_server(
-    [
-        index,
-        callgroup,
-        reversepolarity,
-        ipcal,
-    ],
-    auto_open_webbrowser=True,
-    port=7086,
-)
+def server():
+    start_server(
+        [
+            index,
+            callgroup,
+            reversepolarity,
+            ipcal,
+        ],
+        auto_open_webbrowser=True,
+        port=7086,
+    )
+
+
+if __name__ == "__main__":
+    server()
