@@ -40,6 +40,6 @@ start_server(
         reversepolarity,
         ipcal,
     ],
-    host="127.0.0.1",
+    auto_open_webbrowser=True,
     port=7086,
 )
