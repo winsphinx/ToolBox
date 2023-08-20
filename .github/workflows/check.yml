@@ -10,7 +10,13 @@ on:
 
 jobs:
   check:
-    runs-on: windows-latest
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
 
     steps:
     - uses: actions/checkout@v3
