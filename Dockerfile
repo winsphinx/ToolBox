@@ -8,4 +8,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 EXPOSE 7086
 
-CMD ["python3", "./index.py"]
+ENTRYPOINT ["python3", "./index.py"]
