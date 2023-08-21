@@ -15,6 +15,11 @@ class IPcal:
             label="IP 地址",
             placeholder="输入 IP 地址，如 10.0.1.0/255.255.255.252，或 10.0.1.0/30，或 ::1/126。",
         )
+        put_input(
+            "ip2",
+            label="要挖掉的 IP 地址",
+            placeholder="格式同上。用不到留空。",
+        )
         put_button(label="点击查看结果", onclick=self.update)
         put_markdown("----")
         put_scope("output")
@@ -43,8 +48,15 @@ class IPcal:
 
             content += f"{hosts}"
 
+            if pin["ip2"]:
+                network2 = ipaddress.ip_interface(pin["ip2"]).network
+                rest = list(network.address_exclude(network2))
+                rest_net = [str(x) for x in rest]
+                content += f"\n\n从 {network} 里抠掉 {network2} 后，留下的网络是：\n"
+                content += f"{rest_net}"
+
         except ValueError:
-            content = "这不是一个有效的 IP 地址。"
+            content = "这不是一个有效的 IP 地址（段）。"
 
         put_text(content)
 
