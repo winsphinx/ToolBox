@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import ipaddress
+import math
 
 from pywebio.output import put_button, put_markdown, put_scope, put_text, use_scope
 from pywebio.pin import pin, put_input
@@ -41,12 +42,15 @@ class IPcal:
                 content += f"它的压缩地址是：{network.compressed}\n"
                 content += f"它的扩展地址是：{network.exploded}\n"
 
-            content += f"它的地址数量有：{network.num_addresses} 个\n它的可用地址有：\n"
-            hosts = [str(x) for x in list(network.hosts())]
-            if len(hosts) > 10:
-                hosts = hosts[:5] + ["......"] + hosts[-5:]
+            num = network.num_addresses
+            content += f"它的地址数量有：{num} 个，即 2 的 {int(math.log(num,2))} 次方。\n"
 
-            content += f"{hosts}"
+            if num <= 256:
+                hosts = [str(x) for x in list(network.hosts())]
+                if len(hosts) > 10:
+                    hosts = hosts[:5] + ["......"] + hosts[-5:]
+
+                content += f"它的可用地址有：\n{hosts}"
 
             if pin["ip2"]:
                 network2 = ipaddress.ip_interface(pin["ip2"]).network
