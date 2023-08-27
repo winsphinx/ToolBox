@@ -45,7 +45,7 @@ class IPcal:
             num = network.num_addresses
             content += f"它的地址数量有：{num} 个，即 2 的 {int(math.log(num,2))} 次方。\n"
 
-            if num <= 256:
+            if num <= 65536:
                 hosts = [str(x) for x in list(network.hosts())]
                 if len(hosts) > 10:
                     hosts = hosts[:5] + ["......"] + hosts[-5:]
