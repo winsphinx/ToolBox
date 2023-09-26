@@ -47,9 +47,7 @@ class Callgroup:
                 put_text("错误：请输入8位号码！中间不要有空行。")
                 return
 
-            content += (
-                f'SET OSU FA:PUI="tel:+86575{n}",PILOT="tel:+86575{main_number}",DISPILOT="YES",CHARGPILOT="YES";\n'
-            )
+            content += f'SET OSU FA:PUI="tel:+86575{n}",PILOT="tel:+86575{main_number}",DISPILOT="YES",CHARGPILOT="YES";\n'
         content += f'SHOW CALLGROUPPUI:PSI="tel:+86575{main_number}";\n'
 
         put_text(content)
