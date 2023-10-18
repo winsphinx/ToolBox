@@ -7,5 +7,17 @@
 ## Docker
 
 ```sh
-docker run -d --name=toolbox -p 7086:7086 ghcr.io/winsphinx/toolbox:latest
+docker run -d --name=toolbox --restart=unless-stopped -p 7086:7086 ghcr.io/winsphinx/toolbox:latest
+```
+
+或
+
+```yaml
+version: '3'
+services:
+  toolbox:
+    image: ghcr.io/winsphinx/toolbox
+    container_name: toolbox
+    restart: unless-stopped
+    ports: 7086:7086
 ```
