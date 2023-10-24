@@ -10,11 +10,34 @@ from pywebio.pin import pin, put_input, put_textarea
 class Callgroup:
     def __init__(self):
         put_markdown("# 轮选组脚本生成器")
-        put_input("name", label="名称")
-        put_input("code", label="编号", placeholder="绍兴从50000开始编号。")
-        put_input("main_number", label="引示号", placeholder="填写8位号码。")
-        put_textarea("sub_numbers", label="小号", placeholder="每行一个号码，回车分割。\n如果引示号本身也参与轮选，则也要将其加入。")
-        put_button(label="点击生成脚本", onclick=self.update)
+        put_input(
+            "name",
+            label="名称",
+            placeholder="某某公司",
+            help_text="轮选组的名称，不要超过32字符。",
+        )
+        put_input(
+            "code",
+            label="编号",
+            placeholder="5xxxx",
+            help_text="绍兴从50000开始编号。",
+        )
+        put_input(
+            "main_number",
+            label="引示号",
+            placeholder="88888888",
+            help_text="填写8位号码。",
+        )
+        put_textarea(
+            "sub_numbers",
+            label="小号",
+            placeholder="88888888\n77777777\n66666666\n...",
+            help_text="每行一个号码，回车分割。如果引示号本身也参与轮选，则也要将其加入。",
+        )
+        put_button(
+            label="点击生成脚本",
+            onclick=self.update,
+        )
         put_markdown("----")
         put_scope("output")
 

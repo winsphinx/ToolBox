@@ -13,9 +13,13 @@ class Reversepolarity:
         put_textarea(
             "numbers",
             label="号码",
-            placeholder="从GPON复制的数据，每行一个号码。格式为：\nsippstnuser add 0/2/1 0 telno 8657588111111\nsippstnuser add 0/2/4 0 telno 8657588222222\n...",
+            placeholder="sippstnuser add 0/2/1 0 telno 8657588111111\nsippstnuser add 0/2/4 0 telno 8657588222222\n...",
+            help_text="从GPON复制的数据，每行一个号码。",
         )
-        put_button(label="点击生成脚本", onclick=self.update)
+        put_button(
+            label="点击生成脚本",
+            onclick=self.update,
+        )
         put_markdown("----")
         put_scope("output")
 
