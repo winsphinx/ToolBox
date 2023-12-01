@@ -10,6 +10,7 @@ from pywebio.session import go_app
 from modules.callgroup import Callgroup
 from modules.reversepolarity import Reversepolarity
 from modules.ipcal import IPcal
+from modules.sites import Sites
 
 
 def index():
@@ -19,6 +20,7 @@ def index():
     put_button("轮选组脚本生成器", onclick=lambda: go_app("callgroup"), color=choice(colors))
     put_button("反极性脚本生成器", onclick=lambda: go_app("reversepolarity"), color=choice(colors))
     put_button("IP 地址计算器", onclick=lambda: go_app("ipcal"), color=choice(colors))
+    put_button("基站稽核", onclick=lambda: go_app("sites"), color=choice(colors))
 
 
 def callgroup():
@@ -33,6 +35,10 @@ def ipcal():
     IPcal()
 
 
+def sites():
+    Sites()
+
+
 def server():
     start_server(
         [
@@ -40,6 +46,7 @@ def server():
             callgroup,
             reversepolarity,
             ipcal,
+            sites,
         ],
         auto_open_webbrowser=True,
         port=7086,
