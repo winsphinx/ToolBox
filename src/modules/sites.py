@@ -1,14 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import json
-import pandas as pd
-import time
-import urllib.request
 
-from pywebio.output import put_button, put_file, put_markdown, put_scope, put_text, use_scope, put_datatable, toast
-from pywebio.pin import pin, put_textarea
+import pandas as pd
 from pywebio.input import file_upload
+from pywebio.output import put_datatable, put_file, put_markdown
 
 
 def format_file(file):
@@ -21,15 +17,21 @@ def format_file(file):
     return data
 
 
-def deal_data(data):
-    df = pd.DataFrame(data)  # data is list, to pd
-    df = df.head(100)
-    head = df.columns
+def format_data(data):
+    df = pd.DataFrame(data)  # data is list, convert to pd
+    df = deal_data(df)
+    header = df.columns
     l = df.values.tolist()
     n = len(l)
     data = []
     for m in range(n):
-        data.append({k: v for k, v in zip(head, l[m])})
+        data.append({k: v for k, v in zip(header, l[m])})
+
+    return data
+
+
+def deal_data(data):
+    data = data.head(10)
 
     return data
 
@@ -56,30 +58,15 @@ class Sites:
         put_markdown("### 原始表预览")
         put_datatable(
             data,
-            #            actions=[
-            #                ("Edit Email", lambda row_id: datatable_update("user", input("Email"), row_id, "email")),
-            #                ("Insert a Row", lambda row_id: datatable_insert("user", data[0], row_id)),
-            #                None,  # separator
-            #                ("Delete", lambda row_id: datatable_remove("user", row_id)),
-            #            ],
-            #            onselect=lambda row_id: toast(f"Selected row: {row_id}"),
             instance_id="sites",
         )
 
         put_markdown("### 转换后预览")
-        new_data = deal_data(data)
+        new_data = format_data(data)
         put_datatable(
             new_data,
-            #            actions=[
-            #                ("Edit Email", lambda row_id: datatable_update("user", input("Email"), row_id, "email")),
-            #                ("Insert a Row", lambda row_id: datatable_insert("user", data[0], row_id)),
-            #                None,  # separator
-            #                ("Delete", lambda row_id: datatable_remove("user", row_id)),
-            #            ],
-            #            onselect=lambda row_id: toast(f"Selected row: {row_id}"),
             instance_id="sites_v",
         )
-        #        put_scope("output")
 
         content = convert_to_csv(new_data)
         put_file("result.csv", content.encode(), ">> 点击下载生成后的文件 <<")
