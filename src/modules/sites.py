@@ -69,7 +69,11 @@ class Sites:
         )
 
         content = convert_to_csv(new_data)
-        put_file("result.csv", content.encode(), ">> 点击下载生成后的文件 <<")
+        put_file(
+            "result.csv",
+            content.encode(),
+            ">> 点击下载生成后的文件 <<",
+        )
 
 
 if __name__ == "__main__":

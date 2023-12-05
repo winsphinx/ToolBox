@@ -14,19 +14,19 @@ class Callgroup:
             "name",
             label="名称",
             placeholder="某某公司",
-            help_text="轮选组的名称，不要超过32字符。",
+            help_text="轮选组的名称，不要超过 32 字符。",
         )
         put_input(
             "code",
             label="编号",
             placeholder="5xxxx",
-            help_text="绍兴从50000开始编号。",
+            help_text="绍兴从 50000 开始编号。",
         )
         put_input(
             "main_number",
             label="引示号",
             placeholder="88888888",
-            help_text="填写8位号码。",
+            help_text="填写 8 位号码。",
         )
         put_textarea(
             "sub_numbers",
@@ -55,11 +55,11 @@ class Callgroup:
         sub_numbers = [s.strip() for s in pin["sub_numbers"].strip().split("\n")]
 
         if not self.check_5xxxx(code):
-            put_text("错误：请输入5开头的5位编号！")
+            put_text("错误：请输入 5 开头的 5 位编号！")
             return
 
         if not self.check_8num(main_number):
-            put_text("错误：请输入8位引示号！")
+            put_text("错误：请输入 8 位引示号！")
             return
 
         content = f'ADD CALLGROUP:GRPNO="{code}",NAME="{name}";\n'
@@ -67,7 +67,7 @@ class Callgroup:
         content += f'ADD CALLGRPPSI:PSI="sip:+86575{main_number}@zj.ims.chinaunicom.cn",GRPNO="{code}";\n'
         for n in sub_numbers:
             if not self.check_8num(n):
-                put_text("错误：请输入8位号码！中间不要有空行。")
+                put_text("错误：请输入 8 位号码！中间不要有空行。")
                 return
 
             content += f'SET OSU FA:PUI="tel:+86575{n}",PILOT="tel:+86575{main_number}",DISPILOT="YES",CHARGPILOT="YES";\n'

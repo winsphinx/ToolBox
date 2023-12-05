@@ -14,7 +14,7 @@ class Reversepolarity:
             "numbers",
             label="号码",
             placeholder="sippstnuser add 0/2/1 0 telno 8657588111111\nsippstnuser add 0/2/4 0 telno 8657588222222\n...",
-            help_text="从GPON复制的数据，每行一个号码。",
+            help_text="从 GPON 复制的数据，每行一个号码。",
         )
         put_button(
             label="点击生成脚本",

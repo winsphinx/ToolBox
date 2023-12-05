@@ -61,7 +61,7 @@ class IPcal:
                 network2 = ipaddress.ip_interface(pin["ip2"]).network
                 rest = list(network.address_exclude(network2))
                 rest_net = [str(x) for x in rest]
-                content += f"\n\n从 {network} 里抠掉 {network2} 后，留下的网络是：\n"
+                content += f"\n\n 从 {network} 里抠掉 {network2} 后，留下的网络是：\n"
                 content += f"{rest_net}"
 
         except ValueError:
