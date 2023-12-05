@@ -101,7 +101,7 @@ class Address:
                         content += [[lat, lon, "N/A"]]
 
                 except ValueError:
-                    put_text("经纬度格式不对。")
+                    content += [["N/A", "N/A", f"*{location}* 格式错误"]]
 
             put_table(content)
 
