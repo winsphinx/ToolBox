@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import math
 import re
 from random import choice
+
 from pywebio.output import put_button, put_file, put_markdown, put_scope, put_text, use_scope
 from pywebio.pin import pin, put_input, put_textarea
 
@@ -89,18 +91,6 @@ class Sipcall:
             help_text="绍兴从 2300 到 2399 编号。",
         )
         put_input(
-            "siprt",
-            label="信令路由号",
-            placeholder="23xx",
-            help_text="绍兴从 2300 到 2399 编号。",
-        )
-        put_input(
-            "siprts",
-            label="信令路由集号",
-            placeholder="23xx",
-            help_text="绍兴从 2300 到 2399 编号。",
-        )
-        put_input(
             "tg",
             label="中继组号",
             placeholder="23xx",
@@ -158,8 +148,6 @@ class Sipcall:
         node = pin["node"].strip()
         br1, br2 = pin["brs"].strip().split("/")
         link = pin["link"].strip()
-        siprt = pin["siprt"].strip()
-        siprts = pin["siprts"].strip()
         tg = pin["tg"].strip()
         rt = pin["rt"].strip()
         rts = pin["rts"].strip()
@@ -181,22 +169,20 @@ class Sipcall:
         content += f"NODE：{node}\n"
         content += f"链接：{br1}, {br2}\n"
         content += f"信令链路号：{link}\n"
-        content += f"信令路由号：{siprt}\n"
-        content += f"信令路由集号：{siprts}\n"
-        content += f"中继组号：{siprts}\n"
-        content += f"路由号：{siprts}\n"
-        content += f"路由集号：{siprts}\n"
-        content += f"路由链号：{siprts}\n"
-        content += f"用户鉴权选择子：{siprts}\n"
+        content += f"中继组号：{tg}\n"
+        content += f"路由号：{rt}\n"
+        content += f"路由集号：{rts}\n"
+        content += f"路由链号：{chain}\n"
+        content += f"用户鉴权选择子：{auth}\n"
         content += f"号码：{sub_numbers}\n"
 
-        content += "*" * 20 + "\n\tISBC03\n" + "*" * 20 + "\n"
+        content += "\n\n" + "*" * 20 + "\n\tISBC03\n" + "*" * 20 + "\n"
         content += "//增加下一跳地址\n"
         content += f'ADD NH BASIC:NHID={nexthop},DESC="{name}",IPADDRESS="{ip}";\n'
         content += f'ADD NH RADDR:NHID={nexthop},IPADDR="{ip}",PREFIX=32;\n'
         content += f'SET NH SUB:NHID={nexthop},SIPTR="ENABLE";\n'
         content += "//最大并发数配置\n"
-        content += f'ADD CAC PROFILE:CACPROFILEID={cac},CPDESC="{name}并发数",UGCALLTIME=10,UGCALLNUM={int(max/100*15)+1},UGMAXCALLNUM={max};\n'
+        content += f'ADD CAC PROFILE:CACPROFILEID={cac},CPDESC="{name}并发数",UGCALLTIME=10,UGCALLNUM={math.ceil(max/100*15)},UGMAXCALLNUM={max};\n'
         content += f'ADD INST CACRULE:INSTID={cac},CACRULEID={cac},DESC="{name}";\n'
         content += f'ADD POLICY GROUP:PLGID={cac},FSTLISTID=1,DSCP="{name}";\n'
         content += f'ADD POLICY LIST:PLGID={cac},LISTID=1,DSCP="{name}";\n'
@@ -233,9 +219,10 @@ class Sipcall:
         content += f"ADD POOL MEDIA:SGID=15,POOLID={pool},MEDIA_ID=5,ML=22,MR=2202;\n"
         content += f"ADD POOL MEDIA:SGID=15,POOLID={pool},MEDIA_ID=6,ML=22,MR=2203;\n"
         content += f"SET POOLBASICCONFIG:SGID=15,POOLID={pool},NEXTHOPFAILOVERRULE=1;\n"
+        content += f"SHOW SIGNALPOOL STATUS:SGID=15,POOLID={pool};\n"
         content += f"SAVE CFGFILE\n"
 
-        content += "*" * 20 + "\n\tMGCF\n" + "*" * 20 + "\n"
+        content += "\n\n" + "*" * 20 + "\n\tMGCF\n" + "*" * 20 + "\n"
         content += "//邻接局配置\n"
         content += f'ADD ADJOFC:ID={adj},NAME="{name}-绍兴",MODULE=1,NET=1,OFCTYPE="PSTN",SPCFMT="HEX",SPCTYPE="24",'
         content += f'DPC="{adj}",RC="575",SPTYPE="SEP",SSF="NATIONAL",PRTCTYPE="CHINA";\n'
@@ -263,7 +250,7 @@ class Sipcall:
         METHOD = '"INVITE"&"PRACK"&"ACK"&"UPDATE"&"CANCEL"&"BYE"&"OPTIONS"&"INFO"&"REGISTER"&"SUBSCRIBE"&"REFER"&"NOTIFY"&"MESSAGE"&"PUBLISH"'
         content += f'ADD URI:RTSEL=1,URI="ibac{adj}.zj.ims.chinaunicom.cn",METHOD={METHOD},SIPRTS={adj}\n'
         content += "//中继组配置\n"
-        content += f'ADD TG RTP:TG={tg},OFC={adj},MODULE=0,LINE="SIP",NAME="{name}-绍兴",KIND="BIDIR",TPDAS=52,ROAMDAS=0,SIPROUTESET={siprts};\n'
+        content += f'ADD TG RTP:TG={tg},OFC={adj},MODULE=0,LINE="SIP",NAME="{name}-绍兴",KIND="BIDIR",TPDAS=52,ROAMDAS=0,SIPROUTESET={adj};\n'
         content += f'SET TG:TG={tg},IOI="zj.ims.chinaunicom.cn";\n'
         content += "//设置对等中继标签\n"
         content += f'SET TGFLG:TG={tg},FTGADD="TUKBLOCK"&"REJCAL"&"REJFWDCAL"&"CHKZERO"&"PBXACCESS",FTGDEL="CHARGE",DTGDEL="LOCPFX",CTGADD="SETUPACK"&"ANNOUNCEMENT";\n'
@@ -302,7 +289,7 @@ class Sipcall:
 
         put_text(content)
         put_file(f"{name}.txt", content.encode(), ">> 点击下载脚本 <<")
-        put_markdown("**重要提醒：两个 MGCF 都要加一遍，勿忘传表。**")
+        put_markdown('**重要提醒：两个 MGCF 都要加一遍，勿忘传表（SYN:DATABASE="ALL";）。**')
 
 
 if __name__ == "__main__":
