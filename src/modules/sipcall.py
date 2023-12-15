@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import math
 import re
+from math import ceil
 from random import choice
 
 from pywebio.output import put_button, put_file, put_markdown, put_scope, put_text, use_scope
@@ -44,15 +44,15 @@ class Sipcall:
         )
         put_input(
             "cac",
-            label="呼叫能力",
+            label="呼叫能力 cac perfile",
             placeholder="5xxx",
             help_text="绍兴从 5000 开始编号。",
         )
         put_input(
             "max",
             label="并发数",
-            placeholder="200",
-            help_text="。。",
+            placeholder="100",
+            help_text="按需要填。",
         )
         put_input(
             "mgcf",
@@ -62,63 +62,45 @@ class Sipcall:
         )
         put_input(
             "isbc",
-            label="ISBC 端口",
+            label="与MGCF对接的 ISBC 端口",
             placeholder="5xxx",
-            help_text="绍兴从 5000 开始编号。",
+            help_text="绍兴从 5140-5159 编号。",
         )
         put_input(
             "adj",
             label="邻接局编号",
             placeholder="35xx",
-            help_text="绍兴从 3500 开始编号。",
+            help_text="绍兴从 3500-3599 编号。",
         )
         put_input(
             "node",
             label="节点号",
-            placeholder="xxx",
-            help_text="绍兴从 xxx 开始编号。",
+            placeholder="6xx",
+            help_text="绍兴从 650-699 开始编号。",
         )
         put_input(
             "brs",
             label="连接编号",
             placeholder="23xx/23xx",
-            help_text="绍兴从 2300 到 2399 编号。两个值，中间用 / 隔开。",
+            help_text="绍兴从 2300-2399 编号。两个值，中间用 / 隔开。",
         )
         put_input(
             "link",
             label="信令链路号",
             placeholder="23xx",
-            help_text="绍兴从 2300 到 2399 编号。",
+            help_text="绍兴从 2300-2399 编号。",
         )
         put_input(
             "tg",
             label="中继组号",
             placeholder="23xx",
-            help_text="绍兴从 2300 到 2399 编号。",
-        )
-        put_input(
-            "rt",
-            label="路由号",
-            placeholder="23xx",
-            help_text="绍兴从 2300 到 2399 编号。",
-        )
-        put_input(
-            "rts",
-            label="路由组号",
-            placeholder="23xx",
-            help_text="绍兴从 2300 到 2399 编号。",
-        )
-        put_input(
-            "chain",
-            label="路由链号",
-            placeholder="23xx",
-            help_text="绍兴从 2300 到 2399 编号。",
+            help_text="绍兴从 2300-2399 编号。",
         )
         put_input(
             "auth",
             label="用户鉴权选择子",
             placeholder="2xx",
-            help_text="绍兴从 2xx 编号。",
+            help_text="绍兴从 250-299 编号。",
         )
         put_textarea(
             "sub_numbers",
@@ -149,9 +131,9 @@ class Sipcall:
         br1, br2 = pin["brs"].strip().split("/")
         link = pin["link"].strip()
         tg = pin["tg"].strip()
-        rt = pin["rt"].strip()
-        rts = pin["rts"].strip()
-        chain = pin["chain"].strip()
+        rt = pin["tg"].strip()
+        rts = pin["tg"].strip()
+        chain = pin["tg"].strip()
         auth = pin["auth"].strip()
         sub_numbers = [s.strip() for s in pin["sub_numbers"].strip().split("\n")]
 
@@ -169,6 +151,8 @@ class Sipcall:
         content += f"NODE：{node}\n"
         content += f"链接：{br1}, {br2}\n"
         content += f"信令链路号：{link}\n"
+        content += f"信令路由号：{adj}\n"
+        content += f"信令路由集号：{adj}\n"
         content += f"中继组号：{tg}\n"
         content += f"路由号：{rt}\n"
         content += f"路由集号：{rts}\n"
@@ -176,13 +160,17 @@ class Sipcall:
         content += f"用户鉴权选择子：{auth}\n"
         content += f"号码：{sub_numbers}\n"
 
+        content += "\n\n" + "*" * 20 + "\n\tSDC\n" + "*" * 20 + "\n"
+        for n in sub_numbers:
+            content += f'ADD USR:DN="{n}",LRN="116448{n}",USRTYPE=NGN,LOCZCIDX=5,AREAIDX=5;\n'
+
         content += "\n\n" + "*" * 20 + "\n\tISBC03\n" + "*" * 20 + "\n"
         content += "//增加下一跳地址\n"
         content += f'ADD NH BASIC:NHID={nexthop},DESC="{name}",IPADDRESS="{ip}";\n'
         content += f'ADD NH RADDR:NHID={nexthop},IPADDR="{ip}",PREFIX=32;\n'
         content += f'SET NH SUB:NHID={nexthop},SIPTR="ENABLE";\n'
         content += "//最大并发数配置\n"
-        content += f'ADD CAC PROFILE:CACPROFILEID={cac},CPDESC="{name}并发数",UGCALLTIME=10,UGCALLNUM={math.ceil(max/100*15)},UGMAXCALLNUM={max};\n'
+        content += f'ADD CAC PROFILE:CACPROFILEID={cac},CPDESC="{name}并发数",UGCALLTIME=10,UGCALLNUM={ceil(max/100*15)},UGMAXCALLNUM={max};\n'
         content += f'ADD INST CACRULE:INSTID={cac},CACRULEID={cac},DESC="{name}";\n'
         content += f'ADD POLICY GROUP:PLGID={cac},FSTLISTID=1,DSCP="{name}";\n'
         content += f'ADD POLICY LIST:PLGID={cac},LISTID=1,DSCP="{name}";\n'
@@ -248,7 +236,7 @@ class Sipcall:
         content += f'ADD SIPRTS:ID={adj},NAME="{name}-绍兴",RTPLC="AS",SIPRT={adj}-0;\n'
         content += "//URI分析配置\n"
         METHOD = '"INVITE"&"PRACK"&"ACK"&"UPDATE"&"CANCEL"&"BYE"&"OPTIONS"&"INFO"&"REGISTER"&"SUBSCRIBE"&"REFER"&"NOTIFY"&"MESSAGE"&"PUBLISH"'
-        content += f'ADD URI:RTSEL=1,URI="ibac{adj}.zj.ims.chinaunicom.cn",METHOD={METHOD},SIPRTS={adj}\n'
+        content += f'ADD URI:RTSEL=1,URI="ibac{adj}.zj.ims.chinaunicom.cn",METHOD={METHOD},SIPRTS={adj};\n'
         content += "//中继组配置\n"
         content += f'ADD TG RTP:TG={tg},OFC={adj},MODULE=0,LINE="SIP",NAME="{name}-绍兴",KIND="BIDIR",TPDAS=52,ROAMDAS=0,SIPROUTESET={adj};\n'
         content += f'SET TG:TG={tg},IOI="zj.ims.chinaunicom.cn";\n'
@@ -269,8 +257,8 @@ class Sipcall:
         for i in range(10):
             content += f'ADD AUTH:DAS={auth},DIGIT="{i}",CALLRITID=999,NAME="{name}-绍兴";\n'
         for n in sub_numbers:
-            content += f'ADD AUTH:DAS={auth},DIGIT="{n}",CALLRITID=19,VALIDLEN=8,NAME="{name}-绍兴";\n'
-            content += f'ADD AUTH:DAS={auth},DIGIT="0086575{n}",CALLRITID=19,VALIDLEN=15,NAME="{name}-绍兴";\n'
+            content += f'ADD AUTH:DAS={auth},DIGIT="{n}",CALLRITID=19,VALIDLEN={len(n)},NAME="{name}-绍兴";\n'
+            content += f'ADD AUTH:DAS={auth},DIGIT="0086575{n}",CALLRITID=19,VALIDLEN={len(n)+7},NAME="{name}-绍兴";\n'
         content += "//落地数据配置\n"
         OPT = '"NCEL"&"TCUG"&"HDRTT"&"BODYTT"&"SEND_CCL"'
         for n in sub_numbers:
@@ -286,10 +274,24 @@ class Sipcall:
             content += f'ADD TPDNAL:ENTR=915,DIGIT=0086575{n},CAT="LOL",RST1={chain},MINLEN=15,MAXLEN=15,TPDDI=3,ENOPT={OPT},CALLINGOPTDAS=502;\n'
             content += f'ADD TPDNAL:ENTR=1015,DIGIT=0086575{n},CAT="LOL",RST1={chain},MINLEN=15,MAXLEN=15,TPDDI=3,ENOPT={OPT},CALLINGOPTDAS=502;\n'
             content += f'ADD TPDNAL:ENTR=1115,DIGIT=0086575{n},CAT="LOL",RST1={chain},MINLEN=15,MAXLEN=15,TPDDI=3,ENOPT={OPT},CALLINGOPTDAS=502;\n'
+        for n in sub_numbers:
+            content += "//平时用不上，万一要删除时用这段\n"
+            content += f'//DEL DNAL:ENTR=25,NANNAT="ALL",DIGIT="0086575{n}";\n'
+            content += f'//DEL DNAL:ENTR=115,NANNAT="ALL",DIGIT="0086575{n}";\n'
+            content += f'//DEL DNAL:ENTR=215,NANNAT="ALL",DIGIT="0086575{n}";\n'
+            content += f'//DEL DNAL:ENTR=315,NANNAT="ALL",DIGIT="0086575{n}";\n'
+            content += f'//DEL DNAL:ENTR=415,NANNAT="ALL",DIGIT="0086575{n}";\n'
+            content += f'//DEL DNAL:ENTR=515,NANNAT="ALL",DIGIT="0086575{n}";\n'
+            content += f'//DEL DNAL:ENTR=615,NANNAT="ALL",DIGIT="0086575{n}";\n'
+            content += f'//DEL DNAL:ENTR=715,NANNAT="ALL",DIGIT="0086575{n}";\n'
+            content += f'//DEL DNAL:ENTR=815,NANNAT="ALL",DIGIT="0086575{n}";\n'
+            content += f'//DEL DNAL:ENTR=915,NANNAT="ALL",DIGIT="0086575{n}";\n'
+            content += f'//DEL DNAL:ENTR=1015,NANNAT="ALL",DIGIT="0086575{n}";\n'
+            content += f'//DEL DNAL:ENTR=1115,NANNAT="ALL",DIGIT="0086575{n}";\n'
 
+        content += f'\n//重要提醒：两个 MGCF 都要加一遍，勿忘传表（SYN:DATABASE="ALL";）\n'
         put_text(content)
         put_file(f"{name}.txt", content.encode(), ">> 点击下载脚本 <<")
-        put_markdown('**重要提醒：两个 MGCF 都要加一遍，勿忘传表（SYN:DATABASE="ALL";）。**')
 
 
 if __name__ == "__main__":
