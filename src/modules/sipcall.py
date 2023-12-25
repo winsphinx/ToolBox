@@ -189,9 +189,9 @@ class Sipcall:
             content += f"ADD RAI:RAID={ra1},ALID=1,ITEMID=0,SGID=15,POOLID={mgcf};\n"
             content += f"ADD RAI:RAID={ra2},ALID=1,ITEMID=0,SGID=15,POOLID={pool};\n"
             content += "//增加到MGCF的信令池下一条基本配置。MGCF的下一跳固定为1和2，同一个 pool 下可以增加多个下一跳，可以设置主备方式或者负荷分担\n"
-            content += f'ADD POOLNH BASIC:SGID=15,POOLID={mgcf},NHID=1,IGRROUT={ra1},EGRROUT=200,TRSTDOM="ENABLE";\n'
+            content += f'ADD POOLNH BASIC:SGID=15,POOLID={mgcf},NHID=1,IGRROUT={ra2},EGRROUT=200,TRSTDOM="ENABLE";\n'
             content += f'ADD SIP NEXTHOP LINK:SGID=15,POOLID={mgcf},NHID=1,LINKID=1,LOCALIPADDR="10.108.209.174",LOCALPORT={isbc},REMOTEPORTTYPE="UDP",REMOTEPORT=5060;\n'
-            content += f'ADD POOLNH BASIC:SGID=15,POOLID={mgcf},NHID=2,IGRROUT={ra1},EGRROUT=200,TRSTDOM="ENABLE",TRACKID=1;\n'
+            content += f'ADD POOLNH BASIC:SGID=15,POOLID={mgcf},NHID=2,IGRROUT={ra2},EGRROUT=200,TRSTDOM="ENABLE",TRACKID=1;\n'
             content += f'ADD SIP NEXTHOP LINK:SGID=15,POOLID={mgcf},NHID=2,LINKID=1,LOCALIPADDR="10.108.209.174",LOCALPORT={isbc},REMOTEPORTTYPE="UDP",REMOTEPORT=5060;\n'
             content += f"ADD POOL MEDIA:SGID=15,POOLID={mgcf},MEDIA_ID=1,ML=21,MR=2103;\n"
             content += f"ADD POOL MEDIA:SGID=15,POOLID={mgcf},MEDIA_ID=2,ML=21,MR=2104;\n"
