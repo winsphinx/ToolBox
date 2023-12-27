@@ -51,7 +51,7 @@ class Address:
     @use_scope("output", clear=True)
     def query_address(self):
         try:
-            addresses = [s.strip() for s in pin["address"].strip().split("\n")]
+            addresses = list(set([s.strip() for s in pin["address"].strip().split("\n")]))
             content = [["地址", "经度", "纬度"]]
             total = len(addresses)
             put_progressbar("bar")
@@ -84,7 +84,7 @@ class Address:
     @use_scope("output", clear=True)
     def query_location(self):
         try:
-            locations = [s.strip() for s in pin["address"].strip().split("\n")]
+            locations = list(set([s.strip() for s in pin["address"].strip().split("\n")]))
             content = [["经度", "纬度", "地址"]]
             total = len(locations)
             put_progressbar("bar")
