@@ -239,7 +239,7 @@ class Sipcall:
             content += f'ADD TG RTP:TG={tg},OFC={adj},MODULE=0,LINE="SIP",NAME="{name}-绍兴",KIND="BIDIR",TPDAS=52,ROAMDAS=0,SIPROUTESET={adj};\n'
             content += f'SET TG:TG={tg},IOI="zj.ims.chinaunicom.cn";\n'
             content += "//设置对等中继标签\n"
-            content += f'SET TGFLG:TG={tg},FTGADD="TUKBLOCK"&"REJCAL"&"REJFWDCAL"&"CHKZERO"&"PBXACCESS",FTGDEL="CHARGE",DTGDEL="LOCPFX",CTGADD="SETUPACK"&"ANNOUNCEMENT";\n'
+            content += f'SET TGFLG:TG={tg},FTGADD="CALBLOCK"&"REJCAL"&"REJFWDCAL"&"CHKZERO"&"PBXACCESS",FTGDEL="CHARGE",DTGDEL="LOCPFX",CTGADD="SETUPACK"&"ANNOUNCEMENT";\n'
             content += "//路由配置\n"
             content += f'ADD RT:RT={rt},TG={tg},NAME="{name}-绍兴";\n'
             content += "//路由组配置\n"
