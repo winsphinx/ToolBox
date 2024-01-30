@@ -13,6 +13,7 @@ from modules.sipcall import Sipcall
 from modules.ipcal import IPcal
 from modules.reversepolarity import Reversepolarity
 from modules.sites import Sites
+from modules.flows import Flows
 
 
 def index():
@@ -25,6 +26,7 @@ def index():
     put_button("IP 地址计算器", onclick=lambda: go_app("ipcal"), color=choice(colors))
     put_button("地址-经纬度 查询工具", onclick=lambda: go_app("address"), color=choice(colors))
     put_button("基站稽核工具", onclick=lambda: go_app("sites"), color=choice(colors))
+    put_button("省际流量汇总工具", onclick=lambda: go_app("flows"), color=choice(colors))
 
 
 def callgroup():
@@ -51,6 +53,10 @@ def sites():
     Sites()
 
 
+def flows():
+    Flows()
+
+
 def server():
     start_server(
         [
@@ -61,6 +67,7 @@ def server():
             address,
             ipcal,
             sites,
+            flows,
         ],
         auto_open_webbrowser=True,
         port=7086,
