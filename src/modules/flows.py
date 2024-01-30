@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-
 import ipaddress
+from io import BytesIO
 
 import pandas as pd
 from pywebio.output import put_button, put_file, put_html, put_loading, put_markdown, put_scope, use_scope
@@ -54,10 +54,12 @@ class Flows:
 
     @use_scope("output", clear=True)
     def check_file(self):
-        file = pin["data_file"]
-        df_net = pd.read_excel(file["content"])
-        df_net = df_net[["工程名称", "带宽", "所属节点", "起始IP", "终止IP", "BSS号码", "安装地址"]]
-        df_net["网络"] = df_net.apply(calculate_network, axis=1)
+        with put_loading():
+            file = BytesIO(pin["data_file"]["content"])
+            df_net = pd.read_excel(file)
+            df_net = df_net[["工程名称", "带宽", "所属节点", "起始IP", "终止IP", "BSS号码", "安装地址"]]
+            df_net["网络"] = df_net.apply(calculate_network, axis=1)
+
         err = df_net[df_net["网络"].isnull()]
         if err.empty:
             put_markdown("### 原始地址文件很完美，请上传要匹配的文件。")
@@ -69,10 +71,9 @@ class Flows:
     @use_scope("output", clear=True)
     def match_file(self):
         with put_loading():
-            file = pin["host_file"]
-            df_host = pd.read_excel(file["content"])
+            file = BytesIO(pin["host_file"]["content"])
+            df_host = pd.read_excel(file)
             df_host = df_host.groupby(by=["本端IP"], as_index=False)["本端ip流入-流出差值均值流量bps"].sum()
-
             content = "主机地址,流量合计,网络地址,名称\n"
             for _, row in df_host.iterrows():
                 for net in self.networks["网络"]:
