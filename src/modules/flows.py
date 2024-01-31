@@ -65,6 +65,7 @@ class Flows:
             put_markdown("### 原始地址文件很完美，请上传要匹配的文件。")
         else:
             put_markdown("### 原始地址文件中有以下不规范地址格式，请处理后重新上传。")
+            put_markdown("不要带有括号，也不要用逗号、破折号带多个地址。")
             put_html(df_net[df_net["网络"].isnull()].to_html(border=0))
         self.networks = df_net
 
@@ -74,7 +75,7 @@ class Flows:
             file = BytesIO(pin["host_file"]["content"])
             df_host = pd.read_excel(file)
             df_host = df_host.groupby(by=["本端IP"], as_index=False)["本端ip流入-流出差值均值流量bps"].sum()
-            content = "主机地址,流量合计,网络地址,名称\n"
+            content = "主机地址,流量合计,网络地址,工程名称,BSS号码\n"
             for _, row in df_host.iterrows():
                 for net in self.networks["网络"]:
                     ip = ipaddress.ip_address(row["本端IP"])
@@ -87,6 +88,8 @@ class Flows:
                             + str(net)
                             + ","
                             + self.networks.loc[self.networks["网络"] == net, "工程名称"].values[0]
+                            + ","
+                            + self.networks.loc[self.networks["网络"] == net, "BSS号码"].values[0]
                             + "\n"
                         )
                         break
@@ -94,7 +97,7 @@ class Flows:
                     content += row["本端IP"] + "," + str(row["本端ip流入-流出差值均值流量bps"]) + ",,我是普通宽带\n"
 
         put_file(
-            "export.txt",
+            "导出结果.txt",
             content.encode(),
             ">> 点击下载生成后的文件 <<",
         )
