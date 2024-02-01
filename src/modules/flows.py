@@ -80,25 +80,15 @@ class Flows:
                 for net in self.networks["网络"]:
                     ip = ipaddress.ip_address(row["本端IP"])
                     if ip in net:
-                        content += (
-                            row["本端IP"]
-                            + ","
-                            + str(row["本端ip流入-流出差值均值流量bps"])
-                            + ","
-                            + str(net)
-                            + ","
-                            + self.networks.loc[self.networks["网络"] == net, "工程名称"].values[0]
-                            + ","
-                            + self.networks.loc[self.networks["网络"] == net, "BSS号码"].values[0]
-                            + "\n"
-                        )
+                        res = self.networks.loc[self.networks["网络"] == net, ["工程名称", "BSS号码"]].values[0]
+                        content += row["本端IP"] + "," + str(row["本端ip流入-流出差值均值流量bps"]) + "," + str(net) + "," + res[0] + "," + res[1] + "\n"
                         break
                 else:
-                    content += row["本端IP"] + "," + str(row["本端ip流入-流出差值均值流量bps"]) + ",,我是普通宽带\n"
+                    content += row["本端IP"] + "," + str(row["本端ip流入-流出差值均值流量bps"]) + ",,我是普通宽带,\n"
 
         put_file(
-            "导出结果.txt",
-            content.encode(),
+            "导出结果.csv",
+            content.encode("utf-8-sig"),
             ">> 点击下载生成后的文件 <<",
         )
 
