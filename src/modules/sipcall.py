@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import re
 from math import ceil
 from random import choice
 
@@ -206,7 +205,7 @@ class Sipcall:
             content += f"ADD POOL MEDIA:SGID=15,POOLID={pool},MEDIA_ID=4,ML=22,MR=2202;\n"
             content += f"SET POOLBASICCONFIG:SGID=15,POOLID={pool},NEXTHOPFAILOVERRULE=1;\n"
             content += f"SHOW SIGNALPOOL STATUS:SGID=15,POOLID={pool};\n"
-            content += f"SAVE CFGFILE\n"
+            content += "SAVE CFGFILE\n"
 
             content += "\n\n" + "*" * 20 + "\n\tMGCF\n" + "*" * 20 + "\n"
             content += "//邻接局配置\n"
@@ -287,7 +286,7 @@ class Sipcall:
                 content += f'//DEL DNAL:ENTR=1015,NANNAT="ALL",DIGIT="0086575{n}";\n'
                 content += f'//DEL DNAL:ENTR=1115,NANNAT="ALL",DIGIT="0086575{n}";\n'
 
-            content += f'\n//重要提醒：两个 MGCF 都要加一遍，勿忘传表（SYN:DATABASE="ALL";）\n'
+            content += '\n//重要提醒：两个 MGCF 都要加一遍，勿忘传表（SYN:DATABASE="ALL";）\n'
 
         put_text(content)
         put_file(f"{name}.txt", content.encode(), ">> 点击下载脚本 <<")
