@@ -74,17 +74,18 @@ class Flows:
         with put_loading():
             file = BytesIO(pin["host_file"]["content"])
             df_host = pd.read_excel(file)
-            df_host = df_host.groupby(by=["本端IP"], as_index=False)["本端ip流入-流出差值均值流量bps"].sum()
+            flow_name = df_host.columns[8]
+            df_host = df_host.groupby(by=["本端IP"], as_index=False)[flow_name].sum()
             content = "主机地址,流量合计,网络地址,工程名称,BSS号码\n"
             for _, row in df_host.iterrows():
                 for net in self.networks["网络"]:
                     ip = ipaddress.ip_address(row["本端IP"])
                     if ip in net:
                         res = self.networks.loc[self.networks["网络"] == net, ["工程名称", "BSS号码"]].values[0]
-                        content += row["本端IP"] + "," + str(row["本端ip流入-流出差值均值流量bps"]) + "," + str(net) + "," + res[0] + "," + res[1] + "\n"
+                        content += row["本端IP"] + "," + str(row[flow_name]) + "," + str(net) + "," + str(res[0]) + "," + str(res[1]) + "\n"
                         break
                 else:
-                    content += row["本端IP"] + "," + str(row["本端ip流入-流出差值均值流量bps"]) + ",,我是普通宽带,\n"
+                    content += row["本端IP"] + "," + str(row[flow_name]) + ",,我是普通宽带,\n"
 
         put_file(
             "导出结果.csv",
