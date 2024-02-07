@@ -21,11 +21,11 @@ def format_data(data):
     df = pd.DataFrame(data)  # data is list, convert to pd
     df = deal_data(df)
     header = df.columns
-    l = df.values.tolist()
-    n = len(l)
+    li = df.values.tolist()
+    n = len(li)
     data = []
     for m in range(n):
-        data.append({k: v for k, v in zip(header, l[m])})
+        data.append({k: v for k, v in zip(header, li[m])})
 
     return data
 
