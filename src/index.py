@@ -3,7 +3,7 @@
 
 from random import choice
 
-from pywebio import start_server
+from pywebio import config, start_server
 from pywebio.output import put_button, put_markdown
 from pywebio.session import go_app
 
@@ -58,6 +58,8 @@ def flows():
 
 
 def server():
+    config(title="7086 工具箱", theme="minty")
+
     start_server(
         [
             index,
