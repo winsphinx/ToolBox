@@ -8,7 +8,6 @@ from pywebio.output import put_button, put_markdown, put_progressbar, put_row, p
 from pywebio.pin import pin, put_textarea
 
 KEY = "3252a68ab8715c2d869ffc388d9ce580"
-CITY = "绍兴市"
 OUTPUT = "json"
 
 
@@ -40,7 +39,6 @@ class Address:
         url = "http://restapi.amap.com/v3/geocode/geo?parameters"
         params = {
             "address": address,
-            "city": CITY,
             "key": KEY,
             "output": OUTPUT,
         }
