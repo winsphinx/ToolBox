@@ -71,6 +71,7 @@ def server():
             sites,
             flows,
         ],
+        cdn=False,
         auto_open_webbrowser=True,
         port=7086,
     )
