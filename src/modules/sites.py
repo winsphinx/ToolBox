@@ -2,34 +2,76 @@
 # -*- coding: utf-8 -*-
 
 import json
-from io import StringIO
+import time
+from io import BytesIO
 
 import pandas as pd
 from pywebio.input import file_upload
-from pywebio.output import put_datatable, put_file, put_markdown
+from pywebio.output import put_datatable, put_file, put_loading, put_markdown
 
 
-def format_file(file):
-    return pd.read_csv(StringIO(file["content"].decode("utf-8-sig")))
+def read_file(file):
+    return pd.read_excel(BytesIO(file["content"]), sheet_name=None)
 
 
 def format_data(data):
-    df = pd.DataFrame(data)
-    #    df = deal_data(df)
-    string_df = df.to_json(force_ascii=False, orient="records")
-    data = json.loads(string_df)
-
-    return data
-
-
-def deal_data(data):
-    data = data.head(10)
-
-    return data
+    return json.loads(data.to_json(force_ascii=False, orient="records"))
 
 
 def convert_to_csv(data):
     return data.to_csv(index=False)
+
+
+def deal_data(data):
+    # 按sheet读取
+    df_5GAAU = data["5G AAU"].fillna(0)
+    df_4GRRU = data["4G RRU"].fillna(0)
+    df_5Gsites = data["5G物理基站表"].fillna(0)
+    df_4Gsites = data["4G物理基站表"].fillna(0)
+    df_fee = data["塔租费用表"].fillna(0)
+    df_db = data["塔租数据库"].fillna(0)
+
+    # 匹配基本信息表
+    df_5G = (
+        pd.merge(df_5GAAU, df_5Gsites, left_on="小区名", right_on="Cell_Name", how="left")
+        .filter(["频段", "铁塔站址编号及产权"])
+        .rename(columns={"频段": "Freq", "铁塔站址编号及产权": "Code"})
+    )
+    df_4G = (
+        pd.merge(df_4GRRU, df_4Gsites, left_on="关联4G小区名称", right_on="小区网管名称", how="left")
+        .filter(["频段", "铁塔站址编号"])
+        .rename(columns={"频段": "Freq", "铁塔站址编号": "Code"})
+    )
+
+    # 合并基本信息表
+    result = pd.concat([df_5G, df_4G], ignore_index=True)
+
+    # 按频段分类、求和
+    dummy_freq = pd.get_dummies(result["Freq"], prefix="Freq")
+    result = pd.concat([result, dummy_freq], axis=1).drop("Freq", axis=1)
+    result = result.groupby("Code", as_index=False).sum()
+
+    # 整理费用表
+    df_fee["站址编码"] = df_fee["站址编码"].apply(lambda x: "T" + str(x))
+    df_fee["Money"] = df_fee["小计"].str.replace(",", "").astype(float)
+
+    # 对费用表的金额分类求和，合并到结果表
+    df_fee = df_fee.groupby("站址编码", as_index=False)["Money"].sum()
+    result = pd.merge(result, df_fee, left_on="Code", right_on="站址编码", how="left").drop("站址编码", axis=1)
+
+    # 整理资源表
+    df_db["站址编码"] = df_db["站址编码"].apply(lambda x: "T" + str(x))
+    df_db["Units"] = df_db["产品单元数1"] + df_db["产品单元数2"] + df_db["产品单元数3"]
+
+    # 对资源表的单元数分类求和，合并到结果表
+    df_db_units = df_db.groupby("站址编码", as_index=False)["Units"].sum()
+    result = pd.merge(result, df_db_units, left_on="Code", right_on="站址编码", how="left").drop("站址编码", axis=1)
+
+    # 对资源表的客户数分类平均，合并到结果表
+    df_db_users = df_db.groupby("站址编码", as_index=False)["维护费共享客户数"].mean()
+    result = pd.merge(result, df_db_users, left_on="Code", right_on="站址编码", how="left").drop("站址编码", axis=1).rename(columns={"维护费共享客户数": "Users"})
+
+    return result
 
 
 class Sites:
@@ -38,27 +80,23 @@ class Sites:
 
         file = file_upload(
             "上传文件",
-            accept="text/csv",
-            placeholder="上传一个 *.CSV 文件",
+            accept=".xlsx",
+            placeholder="上传一个 Excel 表，它必须包括 6 个子表。",
         )
 
-        data = format_file(file)
-        put_markdown("### 原始表预览")
-        put_datatable(
-            format_data(data),
-            instance_id="sites_0",
-        )
+        with put_loading():
+            data = read_file(file)
+            data = deal_data(data)
+            content = convert_to_csv(data)
 
         put_markdown("### 转换后预览")
-        new_data = deal_data(data)
         put_datatable(
-            format_data(new_data),
-            instance_id="sites_n",
+            format_data(data),
+            instance_id="sites",
         )
 
-        content = convert_to_csv(new_data)
         put_file(
-            "result.csv",
+            f"{time.strftime('%Y-%m-%d', time.localtime(time.time()))}.csv",
             content.encode("utf-8-sig"),
             ">> 点击下载生成后的文件 <<",
         )
