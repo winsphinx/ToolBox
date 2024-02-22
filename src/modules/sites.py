@@ -49,14 +49,14 @@ def deal_data(data):
     # 按频段分类、求和
     dummy_freq = pd.get_dummies(result["Freq"], prefix="Freq")
     result = pd.concat([result, dummy_freq], axis=1).drop("Freq", axis=1)
-    result = result.groupby("Code", as_index=False).sum()
+    result = result.groupby("Code").sum().reset_index()
 
     # 整理费用表
     df_fee["站址编码"] = df_fee["站址编码"].apply(lambda x: "T" + str(x))
     df_fee["Money"] = df_fee["小计"].str.replace(",", "").astype(float)
 
     # 对费用表的金额分类求和，合并到结果表
-    df_fee = df_fee.groupby("站址编码", as_index=False)["Money"].sum()
+    df_fee = df_fee.groupby("站址编码")["Money"].sum().reset_index()
     result = pd.merge(result, df_fee, left_on="Code", right_on="站址编码", how="left").drop("站址编码", axis=1)
 
     # 整理资源表
@@ -64,14 +64,14 @@ def deal_data(data):
     df_db["Units"] = df_db["产品单元数1"] + df_db["产品单元数2"] + df_db["产品单元数3"]
 
     # 对资源表的单元数分类求和，合并到结果表
-    df_db_units = df_db.groupby("站址编码", as_index=False)["Units"].sum()
+    df_db_units = df_db.groupby("站址编码")["Units"].sum().reset_index()
     result = pd.merge(result, df_db_units, left_on="Code", right_on="站址编码", how="left").drop("站址编码", axis=1)
 
     # 对资源表的客户数分类平均，合并到结果表
-    df_db_users = df_db.groupby("站址编码", as_index=False)["维护费共享客户数"].mean()
+    df_db_users = df_db.groupby("站址编码")["维护费共享客户数"].mean().reset_index()
     result = pd.merge(result, df_db_users, left_on="Code", right_on="站址编码", how="left").drop("站址编码", axis=1).rename(columns={"维护费共享客户数": "Users"})
 
-    return result
+    return result.fillna(0)
 
 
 class Sites:
@@ -85,11 +85,12 @@ class Sites:
         )
 
         with put_loading():
+            put_markdown("### 开始处理，请稍候...")
             data = read_file(file)
             data = deal_data(data)
             content = convert_to_csv(data)
 
-        put_markdown("### 转换后预览")
+        put_markdown("### 处理后的数据预览")
         put_datatable(
             format_data(data),
             instance_id="sites",
