@@ -11,11 +11,11 @@ from pywebio.pin import pin, put_file_upload
 
 def calculate_network(df):
     try:
-        if not df["起始IP"].startswith("2408"):  # for ipv4
+        if df["起始IP"].startswith("2408"):  # for ipv6
+            return ipaddress.ip_network(df["起始IP"])
+        else:  # for ipv4
             for host in ipaddress.summarize_address_range(ipaddress.ip_address(df["起始IP"]), ipaddress.ip_address(df["终止IP"])):
                 return host
-        else:  # for ipv6
-            return ipaddress.ip_network(df["起始IP"])
     except ValueError:
         pass
 
