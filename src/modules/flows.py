@@ -85,7 +85,7 @@ class Flows:
                         content += f'{row["本端IP"]},{str(row[cols[8]])},{str(row[cols[11]])},{str(net)},{res[0]},{str(res[1])}\n'
                         break
                 else:
-                    content += f'{row["本端IP"]},{str(row[cols[8]])},{str(row[cols[11]])},,我是普通宽带,\n'
+                    content += f'{row["本端IP"]},{str(row[cols[8]])},{str(row[cols[11]])},,我不是专线,\n'
 
         put_file(
             "导出结果.csv",
