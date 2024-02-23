@@ -19,7 +19,7 @@ from modules.flows import Flows
 def index():
     put_markdown("# 七零八落工具箱")
 
-    colors = ["primary", "secondary", "success", "danger", "warning", "info", "light", "dark"]
+    colors = ["primary", "secondary", "success", "danger", "warning", "info", "dark"]
     put_button("轮选组脚本生成器", onclick=lambda: go_app("callgroup"), color=choice(colors))
     put_button("反极性脚本生成器", onclick=lambda: go_app("reversepolarity"), color=choice(colors))
     put_button("SIP 数字中继脚本生成器", onclick=lambda: go_app("sipcall"), color=choice(colors))
