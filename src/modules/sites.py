@@ -31,6 +31,10 @@ def deal_data(data):
     df_fee = data["塔租费用表"].fillna(0)
     df_db = data["塔租数据库"].fillna(0)
 
+    # 预处理：如果5G 4G相同ID，删除4G表中对应共有的行
+    common_rows_index = df_4GRRU[df_4GRRU['设备序列号'].isin(df_5GAAU['设备序列号'])].index
+    df_4GRRU = df_4GRRU.drop(common_rows_index)
+
     # 匹配基本信息表
     df_5G = (
         pd.merge(df_5GAAU, df_5Gsites, left_on="小区名", right_on="Cell_Name", how="left")
