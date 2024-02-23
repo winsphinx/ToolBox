@@ -4,7 +4,7 @@
 # 7086 Tool Box
 七零八落工具箱
 
-## Docker
+## Docker 部署
 
 ```sh
 docker run -d --name=toolbox --restart=unless-stopped -p 7086:7086 ghcr.io/winsphinx/toolbox:latest
@@ -16,7 +16,7 @@ docker run -d --name=toolbox --restart=unless-stopped -p 7086:7086 ghcr.io/winsp
 version: '3'
 services:
   toolbox:
-    image: ghcr.io/winsphinx/toolbox
+    image: ghcr.io/winsphinx/toolbox:latest
     container_name: toolbox
     restart: unless-stopped
     ports: 7086:7086
