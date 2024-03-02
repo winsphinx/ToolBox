@@ -5,6 +5,7 @@ import ipaddress
 from io import BytesIO
 
 import pandas as pd
+from pywebio.input import checkbox, radio
 from pywebio.output import put_button, put_file, put_html, put_loading, put_markdown, put_scope, use_scope
 from pywebio.pin import pin, put_file_upload
 
@@ -74,18 +75,24 @@ class Flows:
         with put_loading():
             file = BytesIO(pin["host_file"]["content"])
             df_host = pd.read_excel(file)
-            cols = df_host.columns
-            df_host = df_host.groupby(by=["本端IP"]).agg({cols[8]: "sum", cols[11]: "sum"}).reset_index()
-            content = "主机地址,流量合计,结算金额,网络地址,工程名称,BSS号码\n"
+            cols = df_host.columns.to_list()
+
+            group_key = radio("选择作为分组依据的列名（单选）", cols)
+            cols.remove(group_key)
+            sum_keys = checkbox("选择要求和的列名（可多选）", cols)
+            df_host = df_host.groupby(by=[group_key]).agg({key: "sum" for key in sum_keys}).reset_index()
+
+            content = f"{group_key},{','.join(sum_keys)},所属网络,工程名称,BSS号码\n"
             for _, row in df_host.iterrows():
+                selected_row = ",".join([str(row[key]) for key in sum_keys if key in row])
                 for net in self.networks["网络"]:
-                    ip = ipaddress.ip_address(row["本端IP"])
+                    ip = ipaddress.ip_address(row[group_key])
                     if ip in net:
                         res = self.networks.loc[self.networks["网络"] == net, ["工程名称", "BSS号码"]].values[0]
-                        content += f'{row["本端IP"]},{str(row[cols[8]])},{str(row[cols[11]])},{str(net)},{res[0]},{str(res[1])}\n'
+                        content += f"{row[group_key]},{selected_row},{str(net)},{res[0]},{str(res[1])}\n"
                         break
                 else:
-                    content += f'{row["本端IP"]},{str(row[cols[8]])},{str(row[cols[11]])},,我不是专线,\n'
+                    content += f"{row[group_key]},{selected_row},,我不是专线,\n"
 
         put_file(
             "导出结果.csv",
