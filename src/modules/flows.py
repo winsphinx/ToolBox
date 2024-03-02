@@ -77,7 +77,7 @@ class Flows:
             df_host = pd.read_excel(file)
             cols = df_host.columns.to_list()
 
-            group_key = radio("选择作为分组依据的列名（单选）", cols)
+            group_key = radio("选择作为分组依据的列名（单选）", cols, value=cols[2], required=True)
             cols.remove(group_key)
             sum_keys = checkbox("选择要求和的列名（可多选）", cols)
             df_host = df_host.groupby(by=[group_key]).agg({key: "sum" for key in sum_keys}).reset_index()
