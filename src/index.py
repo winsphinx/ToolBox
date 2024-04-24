@@ -14,6 +14,7 @@ from modules.ipcal import IPcal
 from modules.reversepolarity import Reversepolarity
 from modules.sites import Sites
 from modules.flows import Flows
+from modules.position import Position
 
 
 def index():
@@ -25,6 +26,7 @@ def index():
     put_button("SIP 数字中继脚本生成器", onclick=lambda: go_app("sipcall"), color=choice(colors))
     put_button("IP 地址计算器", onclick=lambda: go_app("ipcal"), color=choice(colors))
     put_button("地址-经纬度 查询工具", onclick=lambda: go_app("address"), color=choice(colors))
+    put_button("IP 地址-地理位置 查询工具", onclick=lambda: go_app("position"), color=choice(colors))
     put_button("基站稽核工具", onclick=lambda: go_app("sites"), color=choice(colors))
     put_button("省际流量汇总工具", onclick=lambda: go_app("flows"), color=choice(colors))
 
@@ -57,6 +59,10 @@ def flows():
     Flows()
 
 
+def position():
+    Position()
+
+
 def server():
     config(title="7086 工具箱", theme="minty")
 
@@ -70,6 +76,7 @@ def server():
             ipcal,
             sites,
             flows,
+            position,
         ],
         cdn=False,
         auto_open_webbrowser=True,
