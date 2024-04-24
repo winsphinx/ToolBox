@@ -24,22 +24,25 @@ class Position:
 
     @use_scope("output", clear=True)
     def update(self):
-        url = f'http://ip-api.com/json/{pin["ip"]}?lang=zh-CN'
-        response = requests.get(url)
+        if pin["ip"]:
+            url = f'http://ip-api.com/json/{pin["ip"]}?lang=zh-CN'
+            response = requests.get(url)
 
-        if response.status_code == 200:
-            data = response.json()
-            if data["status"] == "success":
-                city = data["city"]
-                country = data["country"]
-                regionName = data["regionName"]
-                lon = data["lon"]
-                lat = data["lat"]
-                put_text(f'IP 地址 {pin["ip"]} 对应的地点是：{country} {regionName} {city}，经纬度是：{lon}，{lat}')
+            if response.status_code == 200:
+                data = response.json()
+                if data["status"] == "success":
+                    city = data["city"]
+                    country = data["country"]
+                    regionName = data["regionName"]
+                    lon = data["lon"]
+                    lat = data["lat"]
+                    put_text(f'IP 地址 {pin["ip"]} 对应的地点是：{country} {regionName} {city}，经纬度是：{lon}，{lat}')
+                else:
+                    put_text("无法获取地点信息")
             else:
-                put_text("无法获取地点信息")
+                put_text("请求失败")
         else:
-            put_text("请求失败")
+            put_text("似乎没有输入内容。。。")
 
 
 if __name__ == "__main__":
