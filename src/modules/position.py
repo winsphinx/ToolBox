@@ -16,7 +16,7 @@ class Position:
             help_text="输入一个 IP 地址。",
         )
         put_button(
-            label="点击查看结果",
+            label="点击查看位置",
             onclick=self.update,
         )
         put_markdown("----")
@@ -34,8 +34,8 @@ class Position:
                     city = data["city"]
                     country = data["country"]
                     regionName = data["regionName"]
-                    lon = data["lon"]
-                    lat = data["lat"]
+                    lon = "东经" + str(data["lon"]) if data["lon"] >= 0 else "西经" + str(abs(data["lon"]))
+                    lat = "北纬" + str(data["lat"]) if data["lat"] >= 0 else "南纬" + str(abs(data["lat"]))
                     put_text(f'IP 地址 {pin["ip"]} 对应的地点是：{country} {regionName} {city}，经纬度是：{lon}，{lat}。')
                 else:
                     put_text("无法获取地点信息。")
