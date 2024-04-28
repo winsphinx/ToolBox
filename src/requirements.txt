@@ -1,5 +1,6 @@
 pywebio
 pandas
+openpyxl
 requests
 ipaddress
 g4f
