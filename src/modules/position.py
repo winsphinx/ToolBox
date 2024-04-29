@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import requests
-from pywebio.output import put_button, put_markdown, put_scope, put_text, use_scope
+from pywebio.output import put_button, put_markdown, put_loading, put_scope, put_text, use_scope
 from pywebio.pin import pin, put_textarea
 
 
@@ -24,29 +24,31 @@ class Position:
 
     @use_scope("output", clear=True)
     def update(self):
-        content = ""
-        if pin["ip"]:
-            ips = [s.strip() for s in pin["ip"].strip().split("\n")]
-            url = "http://ip-api.com/batch?lang=zh-CN"
-            response = requests.post(url, json=ips)
+        with put_loading():
+            content = ""
 
-            if response.status_code == 200:
-                total_data = response.json()
-                for data in total_data:
-                    if data["status"] == "success":
-                        ip = data["query"]
-                        city = data["city"]
-                        country = data["country"]
-                        regionName = data["regionName"]
-                        lon = "东经" + str(data["lon"]) if data["lon"] >= 0 else "西经" + str(abs(data["lon"]))
-                        lat = "北纬" + str(data["lat"]) if data["lat"] >= 0 else "南纬" + str(abs(data["lat"]))
-                        content += f"IP 地址 {ip} 对应的地点是：{country} {regionName} {city}，经纬度是：{lon}°，{lat}°。\n"
-                    else:
-                        content += "无法获取地点信息。\n"
+            if pin["ip"]:
+                ips = [s.strip() for s in pin["ip"].strip().split("\n")]
+                url = "http://ip-api.com/batch?lang=zh-CN"
+                response = requests.post(url, json=ips)
+
+                if response.status_code == 200:
+                    total_data = response.json()
+                    for data in total_data:
+                        if data["status"] == "success":
+                            ip = data["query"]
+                            city = data["city"]
+                            country = data["country"]
+                            regionName = data["regionName"]
+                            lon = "东经" + str(data["lon"]) if data["lon"] >= 0 else "西经" + str(abs(data["lon"]))
+                            lat = "北纬" + str(data["lat"]) if data["lat"] >= 0 else "南纬" + str(abs(data["lat"]))
+                            content += f"IP 地址 {ip} 对应的地点是：{country} {regionName} {city}，经纬度是：{lon}°，{lat}°。\n"
+                        else:
+                            content += "无法获取地点信息。\n"
+                else:
+                    content = "请求失败。"
             else:
-                content = "请求失败。"
-        else:
-            content = "似乎没有输入内容。"
+                content = "似乎没有输入内容。"
 
         put_text(content)
 
