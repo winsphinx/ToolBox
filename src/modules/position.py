@@ -13,7 +13,7 @@ class Position:
             "ip",
             label="IP 地址",
             placeholder="192.168.1.100\n110.0.0.0\n...",
-            help_text="输入一个或多个 IP 地址，每行一个。\n[注] 因 api 限制，每分钟最大查询请求为15次，超出会被封禁1小时。",
+            help_text="输入一个或多个 IP 地址，每行一个。因 api 限制，每分钟最大查询请求为15次，超出会被封禁1小时。",
         )
         put_button(
             label="点击查看位置",
