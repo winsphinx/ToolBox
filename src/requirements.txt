@@ -4,3 +4,4 @@ openpyxl
 requests
 ipaddress
 g4f
+curl_cffi
