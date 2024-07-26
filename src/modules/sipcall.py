@@ -169,25 +169,25 @@ class Sipcall:
             content += f"用户鉴权选择子：{auth}\n"
             content += f"号码：{sub_numbers}\n"
 
-            if mode == "签约模式":
+            if mode == "签约方式":
                 content += "\n\n" + "*" * 20 + "\n\tHSS\n" + "*" * 20 + "\n"
                 for n in sub_numbers:
-                    content += "ADD NEWPVI:PVITYPE=0,PVI=+86575{n}@zj.ims.chinaunicom.cn,IREGFLAG=1,IDENTITYTYPE=0,PECFN=ccf01.zj.ims.chinaunicom.cn,SECFN=ccf02.zj.ims.chinaunicom.cn,PCCFN=ccf01.zj.ims.chinaunicom.cn,SCCFN=ccf02.zj.ims.chinaunicom.cn,SecVer=30,UserName=+86575{n}@zj.ims.chinaunicom.cn,PassWord=123456,Realm=zj.ims.chinaunicom.cn,ACCTypeList=*,ACCInfoList=*,ACCValueList=*;"
-                    content += "ADD NEWPUI:IDENTITYTYPE=0,PUI=sip:+86575{n}@zj.ims.chinaunicom.cn,BARFLAG=0,REGAUTHFG=1,ROAMSCHEMEID=1,SPID=5,SPDesc=绍兴SP,PVIList=+86575{n}@zj.ims.chinaunicom.cn,CapsIDList=575,CapsTypeList=0,LOOSEROUTEIND=0;"
-                    content += "MOD PUIINFO:PUI=tel:+86575{n},LOCALINFO=,LOOSEROUTEIND=0,DISPLAYNAME=*,MAXSESS=0,PHONECONTEXT=,MAXSIMULTREGS=0,SIFCIDList=5030$5600$5910,NATEMPLATEID=0;"
-                    content += "MOD PUIINFO:PUI=sip:+86575{n}@zj.ims.chinaunicom.cn,LOCALINFO=,LOOSEROUTEIND=0,DISPLAYNAME=*,MAXSESS=0,PHONECONTEXT=,MAXSIMULTREGS=0,SIFCIDList=5030$5600$5910,NATEMPLATEID=0;"
-                    content += "SET IMPREGSET:PUIList=sip:+86575{n}@zj.ims.chinaunicom.cn$tel:+86575{n},DefaultPUI=sip:+86575{n}@zj.ims.chinaunicom.cn;"
-                    content += "SET ALIASEGROUP:PUIList=sip:+86575{n}@zj.ims.chinaunicom.cn$tel:+86575{n},AliasGroupID=+86575{n}@zj.ims.chinaunicom.cn;"
+                    content += f"ADD NEWPVI:PVITYPE=0,PVI=+86575{n}@zj.ims.chinaunicom.cn,IREGFLAG=1,IDENTITYTYPE=0,PECFN=ccf01.zj.ims.chinaunicom.cn,SECFN=ccf02.zj.ims.chinaunicom.cn,PCCFN=ccf01.zj.ims.chinaunicom.cn,SCCFN=ccf02.zj.ims.chinaunicom.cn,SecVer=30,UserName=+86575{n}@zj.ims.chinaunicom.cn,PassWord=123456,Realm=zj.ims.chinaunicom.cn,ACCTypeList=*,ACCInfoList=*,ACCValueList=*;\n"
+                    content += f"ADD NEWPUI:IDENTITYTYPE=0,PUI=sip:+86575{n}@zj.ims.chinaunicom.cn,BARFLAG=0,REGAUTHFG=1,ROAMSCHEMEID=1,SPID=5,SPDesc=绍兴SP,PVIList=+86575{n}@zj.ims.chinaunicom.cn,CapsIDList=575,CapsTypeList=0,LOOSEROUTEIND=0;\n"
+                    content += f"MOD PUIINFO:PUI=tel:+86575{n},LOCALINFO=,LOOSEROUTEIND=0,DISPLAYNAME=*,MAXSESS=0,PHONECONTEXT=,MAXSIMULTREGS=0,SIFCIDList=5030$5600$5910,NATEMPLATEID=0;\n"
+                    content += f"MOD PUIINFO:PUI=sip:+86575{n}@zj.ims.chinaunicom.cn,LOCALINFO=,LOOSEROUTEIND=0,DISPLAYNAME=*,MAXSESS=0,PHONECONTEXT=,MAXSIMULTREGS=0,SIFCIDList=5030$5600$5910,NATEMPLATEID=0;\n"
+                    content += f"SET IMPREGSET:PUIList=sip:+86575{n}@zj.ims.chinaunicom.cn$tel:+86575{n},DefaultPUI=sip:+86575{n}@zj.ims.chinaunicom.cn;\n"
+                    content += f"SET ALIASEGROUP:PUIList=sip:+86575{n}@zj.ims.chinaunicom.cn$tel:+86575{n},AliasGroupID=+86575{n}@zj.ims.chinaunicom.cn;\n"
 
                 content += "\n\n" + "*" * 20 + "\n\tSLF\n" + "*" * 20 + "\n"
                 for n in sub_numbers:
-                    content += "ADD SLFUSER:USERIDTYPE=1,USERID=tel:+86575{n},HSSID=1;"
-                    content += "ADD SLFUSER:USERIDTYPE=1,USERID=sip:+86575{n}@zj.ims.chinaunicom.cn,HSSID=1;"
+                    content += f"ADD SLFUSER:USERIDTYPE=1,USERID=tel:+86575{n},HSSID=1;\n"
+                    content += f"ADD SLFUSER:USERIDTYPE=1,USERID=sip:+86575{n}@zj.ims.chinaunicom.cn,HSSID=1;\n"
 
                 content += "\n\n" + "*" * 20 + "\n\tSSS\n" + "*" * 20 + "\n"
                 for n in sub_numbers:
-                    content += 'ADD OSU SBR:PUI="tel:+86575{n}",NETTYPE=1,CC=86,LATA=575,TYPE="CS",ONLCHG="OFF",OFFLCHG="ON",NOTOPEN="OFF",OWE="OFF",IRCFS="ON",IRACFSC="OFF",NSOUTG="OFF",NSICO="OFF",CARDUSER="OFF",FORCEOL="ON",OVLAP="OFF",CFFT="OFF",CORHT="LC"&"DDD"&"IDD"&"SPCS"&"HF"&"HKMACAOTW"&"LT",CIRHT="LC"&"DDD"&"IDD"&"SPCS"&"HF"&"HKMACAOTW"&"LT",OWECIRHT="LC"&"DDD"&"IDD"&"SPCS"&"HF"&"HKMACAOTW"&"LT",CTXOUTRHT="GRPIN"&"GRPOUT"&"GRPOUTNUM",CTXINRHT="GRPIN"&"GRPOUT"&"GRPOUTNUM",OWECTXOUTRHT="GRPIN"&"GRPOUT"&"GRPOUTNUM",OWECTXINRHT="GRPIN"&"GRPOUT"&"GRPOUTNUM",ACOFAD="57501",COMCODE=0,CUSTYPE="B2C",LANGTYPE=0,SPELINE="NO",CALLERAS=0,CALLEDAS=0,CHARGCATEGORY="FREE",CPC=0,PREPAIDTYPE="0",MAXCOMNUM=65535,IMSUSERTYPE="NMIMS",OUTGOINGBLACK="NO";'
-                    content += 'SET OSU OIP:PUI="tel:+86575{n}";'
+                    content += f'ADD OSU SBR:PUI="tel:+86575{n}",NETTYPE=1,CC=86,LATA=575,TYPE="CS",ONLCHG="OFF",OFFLCHG="ON",NOTOPEN="OFF",OWE="OFF",IRCFS="ON",IRACFSC="OFF",NSOUTG="OFF",NSICO="OFF",CARDUSER="OFF",FORCEOL="ON",OVLAP="OFF",CFFT="OFF",CORHT="LC"&"DDD"&"IDD"&"SPCS"&"HF"&"HKMACAOTW"&"LT",CIRHT="LC"&"DDD"&"IDD"&"SPCS"&"HF"&"HKMACAOTW"&"LT",OWECIRHT="LC"&"DDD"&"IDD"&"SPCS"&"HF"&"HKMACAOTW"&"LT",CTXOUTRHT="GRPIN"&"GRPOUT"&"GRPOUTNUM",CTXINRHT="GRPIN"&"GRPOUT"&"GRPOUTNUM",OWECTXOUTRHT="GRPIN"&"GRPOUT"&"GRPOUTNUM",OWECTXINRHT="GRPIN"&"GRPOUT"&"GRPOUTNUM",ACOFAD="57501",COMCODE=0,CUSTYPE="B2C",LANGTYPE=0,SPELINE="NO",CALLERAS=0,CALLEDAS=0,CHARGCATEGORY="FREE",CPC=0,PREPAIDTYPE="0",MAXCOMNUM=65535,IMSUSERTYPE="NMIMS",OUTGOINGBLACK="NO";\n'
+                    content += f'SET OSU OIP:PUI="tel:+86575{n}";\n'
 
             content += "\n\n" + "*" * 20 + "\n\tSDC\n" + "*" * 20 + "\n"
             for n in sub_numbers:
@@ -263,7 +263,7 @@ class Sipcall:
             METHOD = '"INVITE"&"PRACK"&"ACK"&"UPDATE"&"CANCEL"&"BYE"&"OPTIONS"&"INFO"&"REGISTER"&"SUBSCRIBE"&"REFER"&"NOTIFY"&"MESSAGE"&"PUBLISH"'
             content += f'ADD URI:RTSEL=1,URI="ibac{adj}.zj.ims.chinaunicom.cn",METHOD={METHOD},SIPRTS={adj};\n'
             content += "//中继组配置\n"
-            TPDAS = {"对等模式": 52, "签约模式": 250}.get(mode, None)
+            TPDAS = {"对等方式": 52, "签约方式": 250}.get(mode, None)
             content += f'ADD TG RTP:TG={tg},OFC={adj},MODULE=0,LINE="SIP",NAME="{name}-绍兴",KIND="BIDIR",TPDAS={TPDAS},ROAMDAS=0,SIPROUTESET={adj};\n'
             content += f'SET TG:TG={tg},IOI="zj.ims.chinaunicom.cn";\n'
             content += "//设置对等中继标签\n"
@@ -283,7 +283,7 @@ class Sipcall:
             for i in range(10):
                 content += f'ADD AUTH:DAS={auth},DIGIT="{i}",CALLRITID=999,NAME="{name}-绍兴";\n'
             for n in sub_numbers:
-                CALLRITID = {"对等模式": 19, "签约模式": 200}.get(mode, None)
+                CALLRITID = {"对等方式": 19, "签约方式": 200}.get(mode, None)
                 content += f'ADD AUTH:DAS={auth},DIGIT="{n}",CALLRITID={CALLRITID},VALIDLEN={len(n)},NAME="{name}-绍兴";\n'
                 content += f'ADD AUTH:DAS={auth},DIGIT="0086575{n}",CALLRITID={CALLRITID},VALIDLEN={len(n)+7},NAME="{name}-绍兴";\n'
             content += "//落地数据配置\n"
