@@ -32,7 +32,7 @@ def deal_data(data):
     df_db = data["塔租数据库"].fillna(0)
 
     # 预处理：如果5G 4G相同ID，删除4G表中对应共有的行
-    common_rows_index = df_4GRRU[df_4GRRU['设备序列号'].isin(df_5GAAU['设备序列号'])].index
+    common_rows_index = df_4GRRU[df_4GRRU["设备序列号"].isin(df_5GAAU["设备序列号"])].index
     df_4GRRU = df_4GRRU.drop(common_rows_index)
 
     # 匹配基本信息表
