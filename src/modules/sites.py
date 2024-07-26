@@ -36,16 +36,8 @@ def deal_data(data):
     df_4GRRU = df_4GRRU.drop(common_rows_index)
 
     # 匹配基本信息表
-    df_5G = (
-        pd.merge(df_5GAAU, df_5Gsites, left_on="小区名", right_on="Cell_Name", how="left")
-        .filter(["频段", "铁塔站址编号及产权"])
-        .rename(columns={"频段": "Freq", "铁塔站址编号及产权": "Code"})
-    )
-    df_4G = (
-        pd.merge(df_4GRRU, df_4Gsites, left_on="关联4G小区名称", right_on="小区网管名称", how="left")
-        .filter(["频段", "铁塔站址编号"])
-        .rename(columns={"频段": "Freq", "铁塔站址编号": "Code"})
-    )
+    df_5G = pd.merge(df_5GAAU, df_5Gsites, left_on="小区名", right_on="Cell_Name", how="left").filter(["频段", "铁塔站址编号及产权"]).rename(columns={"频段": "Freq", "铁塔站址编号及产权": "Code"})
+    df_4G = pd.merge(df_4GRRU, df_4Gsites, left_on="关联4G小区名称", right_on="小区网管名称", how="left").filter(["频段", "铁塔站址编号"]).rename(columns={"频段": "Freq", "铁塔站址编号": "Code"})
 
     # 合并基本信息表
     result = pd.concat([df_5G, df_4G], ignore_index=True)

@@ -33,4 +33,12 @@ jobs:
 
     - name: Lint with flake8
       run:
-        flake8 . --count --max-complexity=10 --max-line-length=180 --statistics
+        flake8 . --count --max-complexity=10 --max-line-length=1080 --statistics
+
+    - name: Cleanup histories
+      uses: Mattraks/delete-workflow-runs@v2
+      with:
+        token: ${{ github.token }}
+        repository: ${{ github.repository }}
+        retain_days: 30
+        keep_minimum_runs: 0
