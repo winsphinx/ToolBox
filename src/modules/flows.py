@@ -26,7 +26,7 @@ class Flows:
         self.networks = None
         self.host = None
 
-        put_markdown("# 省际流量汇总")
+        put_markdown("# 省际流量分析")
 
         put_file_upload(
             name="data_file",
