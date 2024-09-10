@@ -28,7 +28,7 @@ def index():
     put_button("地址-经纬度 查询工具", onclick=lambda: go_app("address"), color=choice(colors))
     put_button("IP 地址-地理位置 查询工具", onclick=lambda: go_app("position"), color=choice(colors))
     put_button("基站稽核工具", onclick=lambda: go_app("sites"), color=choice(colors))
-    put_button("省际流量汇总工具", onclick=lambda: go_app("flows"), color=choice(colors))
+    put_button("省际流量分析工具", onclick=lambda: go_app("flows"), color=choice(colors))
 
 
 def callgroup():
