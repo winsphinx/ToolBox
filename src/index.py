@@ -15,6 +15,7 @@ from modules.reversepolarity import Reversepolarity
 from modules.sites import Sites
 from modules.flows import Flows
 from modules.position import Position
+from modules.ngn2ims import NGN2IMS
 
 
 def index():
@@ -29,6 +30,7 @@ def index():
     put_button("IP 地址-地理位置 查询工具", onclick=lambda: go_app("position"), color=choice(colors))
     put_button("基站稽核工具", onclick=lambda: go_app("sites"), color=choice(colors))
     put_button("省际流量分析工具", onclick=lambda: go_app("flows"), color=choice(colors))
+    put_button("NGN->IMS 脚本生成器", onclick=lambda: go_app("ngn2ims"), color=choice(colors))
 
 
 def callgroup():
@@ -63,6 +65,10 @@ def position():
     Position()
 
 
+def ngn2ims():
+    NGN2IMS()
+
+
 def server():
     config(title="7086 工具箱", theme="minty")
 
@@ -77,6 +83,7 @@ def server():
             sites,
             flows,
             position,
+            ngn2ims,
         ],
         cdn=False,
         auto_open_webbrowser=True,

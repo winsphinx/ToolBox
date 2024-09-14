@@ -78,7 +78,7 @@ class Sites:
             "上传文件",
             accept=".xlsx",
             placeholder="在这里上传一个表格。",
-            help_text="必须包括 6 个子表：5G AAU、4G RRU、5G物理基站表、4G物理基站表、塔租费用表、塔租数据库。"
+            help_text="必须包括 6 个子表：5G AAU、4G RRU、5G物理基站表、4G物理基站表、塔租费用表、塔租数据库。",
         )
 
         with put_loading():
