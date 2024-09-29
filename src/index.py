@@ -16,6 +16,7 @@ from modules.sites import Sites
 from modules.flows import Flows
 from modules.position import Position
 from modules.ngn2ims import NGN2IMS
+from modules.addims import ADDIMS
 
 
 def index():
@@ -30,6 +31,7 @@ def index():
     put_button("IP 地址-地理位置 查询工具", onclick=lambda: go_app("position"), color=choice(colors))
     put_button("基站稽核工具", onclick=lambda: go_app("sites"), color=choice(colors))
     put_button("省际流量分析工具", onclick=lambda: go_app("flows"), color=choice(colors))
+    put_button("IMS 加号码脚本生成器", onclick=lambda: go_app("addims"), color=choice(colors))
     put_button("NGN->IMS 脚本生成器", onclick=lambda: go_app("ngn2ims"), color=choice(colors))
 
 
@@ -65,6 +67,10 @@ def position():
     Position()
 
 
+def addims():
+    ADDIMS()
+
+
 def ngn2ims():
     NGN2IMS()
 
@@ -83,6 +89,7 @@ def server():
             sites,
             flows,
             position,
+            addims,
             ngn2ims,
         ],
         cdn=False,
