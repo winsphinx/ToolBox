@@ -52,13 +52,13 @@ local-digitmap add DefaultNormalDmm normal [2-8]xxxxxSxx|1[34568]xxxxxxxxx|17[0-
 
 local-digitmap add DefaultSccDmm scc EExx|ExxFx.E|ExxFx.L|ExFx.E|ExFx.L|Exx.F|EFxx.F|Fxx.F|Exx.Ex.F|ExxEx.Ex.Ex.F|ExxEx.Ex.F|Fxx.Ex.Ex.F|EFxx.Ex.F|Fxx.Ex.F|ExxE.S|EFxxE.S|ExxEx.s
 
-vlan 100 smart
+vlan 101 smart
 
-protocol-8021p-pri 6 vlan 100
+protocol-8021p-pri 6 vlan 101
 
-port vlan 100 0/0 1
+port vlan 101 0/0 1
 
-interface vlanif 100
+interface vlanif 101
 
 dhcp-client enable
 
@@ -67,7 +67,7 @@ quit
 interface sip 0
 y
 
-if-sip attribute basic signal-port 5060 media-ip media-dhcp-vlan 100 signal-ip signal-dhcp-vlan 100 home-domain zj.ims.chinaunicom.cn
+if-sip attribute basic signal-port 5060 media-ip media-dhcp-vlan 101 signal-ip signal-dhcp-vlan 101 home-domain zj.ims.chinaunicom.cn
 
 if-sip attribute basic primary-proxy-ip1 {area[0]} primary-proxy-port 5060
 
