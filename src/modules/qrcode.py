@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import shutil
 import time
 import zipfile
 from io import BytesIO
@@ -82,15 +83,15 @@ class QRCode:
                     if os.path.splitext(file)[1] == ".png":
                         f.write(os.path.join("outputs", file), file)
 
-            os.system("rm -rf inputs")
-            os.system("rm -rf outputs")
+            shutil.rmtree("inputs")
+            shutil.rmtree("outputs")
 
         put_file(
             f"QRCode-{time.strftime('%Y%m%d%H%M', time.localtime(time.time()))}.zip",
             open("qrcodes.zip", "rb").read(),
             ">> 点击下载生成后的文件 <<",
         )
-        os.system("rm qrcodes.zip")
+        os.remove("qrcodes.zip")
 
 
 if __name__ == "__main__":
