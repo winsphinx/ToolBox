@@ -17,6 +17,7 @@ from modules.flows import Flows
 from modules.position import Position
 from modules.ngn2ims import NGN2IMS
 from modules.addims import ADDIMS
+from modules.qrcode import QRCode
 
 
 def index():
@@ -32,7 +33,8 @@ def index():
     put_button("基站稽核工具", onclick=lambda: go_app("sites"), color=choice(colors))
     put_button("省际流量分析工具", onclick=lambda: go_app("flows"), color=choice(colors))
     put_button("IMS 加号码脚本生成器", onclick=lambda: go_app("addims"), color=choice(colors))
-    put_button("NGN->IMS 脚本生成器", onclick=lambda: go_app("ngn2ims"), color=choice(colors))
+    put_button("NGN 签转 IMS 脚本生成器", onclick=lambda: go_app("ngn2ims"), color=choice(colors))
+    put_button("码化之二维码生成工具", onclick=lambda: go_app("qrcode"), color=choice(colors))
 
 
 def callgroup():
@@ -75,6 +77,10 @@ def ngn2ims():
     NGN2IMS()
 
 
+def qrcode():
+    QRCode()
+
+
 def server():
     config(title="7086 工具箱", theme="minty")
 
@@ -91,6 +97,7 @@ def server():
             position,
             addims,
             ngn2ims,
+            qrcode,
         ],
         cdn=False,
         auto_open_webbrowser=True,
