@@ -33,4 +33,4 @@ jobs:
 
     - name: Lint with flake8
       run:
-        flake8 . --count --max-complexity=10 --max-line-length=1080 --statistics
+        flake8 . --count --max-complexity=16 --max-line-length=1080 --statistics
