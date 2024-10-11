@@ -17,6 +17,12 @@ class Sipcall:
             options=["对等方式", "签约方式"],
             inline=True,
         )
+        put_radio(
+            "isbc_number",
+            label="选择ISBC",
+            options=["ISBC-3", "ISBC-4"],
+            inline=True,
+        )
         put_input(
             "name",
             label="名称",
@@ -104,8 +110,8 @@ class Sipcall:
         put_input(
             "auth",
             label="用户鉴权选择子",
-            placeholder="2xx",
-            help_text="绍兴从 250-299 编号。",
+            placeholder="18xx",
+            help_text="绍兴原有编号 250-299 已用完，现在从 1800-1899 编号。",
         )
         put_textarea(
             "sub_numbers",
@@ -125,6 +131,7 @@ class Sipcall:
         with put_loading():
             put_text("开始生成脚本...")
             mode = pin["mode"]
+            isbc_number = pin["isbc_number"]
             name = pin["name"].strip()
             ip = pin["IP"].strip()
             pool = pin["pool"].strip()
@@ -189,6 +196,13 @@ class Sipcall:
                     content += f'ADD OSU SBR:PUI="tel:+86575{n}",NETTYPE=1,CC=86,LATA=575,TYPE="CS",ONLCHG="OFF",OFFLCHG="ON",NOTOPEN="OFF",OWE="OFF",IRCFS="ON",IRACFSC="OFF",NSOUTG="OFF",NSICO="OFF",CARDUSER="OFF",FORCEOL="ON",OVLAP="OFF",CFFT="OFF",CORHT="LC"&"DDD"&"IDD"&"SPCS"&"HF"&"HKMACAOTW"&"LT",CIRHT="LC"&"DDD"&"IDD"&"SPCS"&"HF"&"HKMACAOTW"&"LT",OWECIRHT="LC"&"DDD"&"IDD"&"SPCS"&"HF"&"HKMACAOTW"&"LT",CTXOUTRHT="GRPIN"&"GRPOUT"&"GRPOUTNUM",CTXINRHT="GRPIN"&"GRPOUT"&"GRPOUTNUM",OWECTXOUTRHT="GRPIN"&"GRPOUT"&"GRPOUTNUM",OWECTXINRHT="GRPIN"&"GRPOUT"&"GRPOUTNUM",ACOFAD="57501",COMCODE=0,CUSTYPE="B2C",LANGTYPE=0,SPELINE="NO",CALLERAS=0,CALLEDAS=0,CHARGCATEGORY="FREE",CPC=0,PREPAIDTYPE="0",MAXCOMNUM=65535,IMSUSERTYPE="NMIMS",OUTGOINGBLACK="NO";\n'
                     content += f'SET OSU OIP:PUI="tel:+86575{n}";\n'
 
+            if isbc_number == "ISBC-3":
+                isbc_ip = "10.0.1.139"
+                mgcf_ip = "10.108.209.174"
+            elif isbc_number == "ISBC-4":
+                isbc_ip = "10.0.1.144"
+                mgcf_ip = "10.108.209.179"
+
             content += "\n\n" + "*" * 20 + "\n\tSDC\n" + "*" * 20 + "\n"
             for n in sub_numbers:
                 content += f'ADD USR:DN="{n}",LRN="116448{n}",USRTYPE=NGN,LOCZCIDX=5,AREAIDX=5;\n'
@@ -217,16 +231,16 @@ class Sipcall:
             content += f"ADD RAI:RAID={ra2},ALID=1,ITEMID=0,SGID=15,POOLID={pool};\n"
             content += "//增加到MGCF的信令池下一条基本配置。MGCF的下一跳固定为1和2，同一个 pool 下可以增加多个下一跳，可以设置主备方式或者负荷分担\n"
             content += f'ADD POOLNH BASIC:SGID=15,POOLID={mgcf},NHID=1,IGRROUT={ra2},EGRROUT=200,TRSTDOM="ENABLE";\n'
-            content += f'ADD SIP NEXTHOP LINK:SGID=15,POOLID={mgcf},NHID=1,LINKID=1,LOCALIPADDR="10.108.209.174",LOCALPORT={isbc},REMOTEPORTTYPE="UDP",REMOTEPORT=5060;\n'
+            content += f'ADD SIP NEXTHOP LINK:SGID=15,POOLID={mgcf},NHID=1,LINKID=1,LOCALIPADDR="{mgcf_ip}",LOCALPORT={isbc},REMOTEPORTTYPE="UDP",REMOTEPORT=5060;\n'
             content += f'ADD POOLNH BASIC:SGID=15,POOLID={mgcf},NHID=2,IGRROUT={ra2},EGRROUT=200,TRSTDOM="ENABLE",TRACKID=1;\n'
-            content += f'ADD SIP NEXTHOP LINK:SGID=15,POOLID={mgcf},NHID=2,LINKID=1,LOCALIPADDR="10.108.209.174",LOCALPORT={isbc},REMOTEPORTTYPE="UDP",REMOTEPORT=5060;\n'
+            content += f'ADD SIP NEXTHOP LINK:SGID=15,POOLID={mgcf},NHID=2,LINKID=1,LOCALIPADDR="{mgcf_ip}",LOCALPORT={isbc},REMOTEPORTTYPE="UDP",REMOTEPORT=5060;\n'
             content += f"ADD POOL MEDIA:SGID=15,POOLID={mgcf},MEDIA_ID=1,ML=21,MR=2103;\n"
             content += f"ADD POOL MEDIA:SGID=15,POOLID={mgcf},MEDIA_ID=2,ML=21,MR=2104;\n"
             content += f"ADD POOL MEDIA:SGID=15,POOLID={mgcf},MEDIA_ID=3,ML=22,MR=2203;\n"
             content += f"ADD POOL MEDIA:SGID=15,POOLID={mgcf},MEDIA_ID=4,ML=22,MR=2204;\n"
             content += f"SET POOLBASICCONFIG:SGID=15,POOLID={mgcf},NEXTHOPFAILOVERRULE=1;\n"
             content += f"ADD POOLNH BASIC:SGID=15,POOLID={pool},NHID={nexthop},IGRROUT={ra1},INPL={nexthop};\n"
-            content += f'ADD SIP NEXTHOP LINK:SGID=15,POOLID={pool},NHID={nexthop},LINKID=1,LOCALIPADDR="10.0.1.139",LOCALPORT=5060,REMOTEPORTTYPE="UDP",REMOTEPORT=5060;\n'
+            content += f'ADD SIP NEXTHOP LINK:SGID=15,POOLID={pool},NHID={nexthop},LINKID=1,LOCALIPADDR="{isbc_ip}",LOCALPORT=5060,REMOTEPORTTYPE="UDP",REMOTEPORT=5060;\n'
             content += f"ADD POOL MEDIA:SGID=15,POOLID={pool},MEDIA_ID=1,ML=21,MR=2101;\n"
             content += f"ADD POOL MEDIA:SGID=15,POOLID={pool},MEDIA_ID=2,ML=21,MR=2102;\n"
             content += f"ADD POOL MEDIA:SGID=15,POOLID={pool},MEDIA_ID=3,ML=22,MR=2201;\n"
@@ -248,8 +262,8 @@ class Sipcall:
             content += "//邻接主机配置\n"
             content += f'ADD ADJHOST:ID={adj},HOSTNAME="ibac{adj}.zj.ims.chinaunicom.cn",REALM="zj.ims.chinaunicom.cn";\n'
             content += "//UDP承载配置\n"
-            content += f'ADD UDPBR:ID={br1},NAME="{name}-绍兴_1",ADDRTYPE="IPV4",IPMODE="REMOTE_VALID",IPV4ADDR="10.108.209.174",PORT=0,MODULE=0,ADJHOST={adj};\n'
-            content += f'ADD UDPBR:ID={br2},NAME="{name}-绍兴_2",ADDRTYPE="IPV4",IPMODE="REMOTE_VALID",IPV4ADDR="10.108.209.174",PORT={isbc},MODULE=0,ADJHOST={adj};\n'
+            content += f'ADD UDPBR:ID={br1},NAME="{name}-绍兴_1",ADDRTYPE="IPV4",IPMODE="REMOTE_VALID",IPV4ADDR="{mgcf_ip}",PORT=0,MODULE=0,ADJHOST={adj};\n'
+            content += f'ADD UDPBR:ID={br2},NAME="{name}-绍兴_2",ADDRTYPE="IPV4",IPMODE="REMOTE_VALID",IPV4ADDR="{mgcf_ip}",PORT={isbc},MODULE=0,ADJHOST={adj};\n'
             content += "//按链路分发\n"
             conn = choice(["3001&1&2&3", "4&5&6&7", "8&9&10&11", "12&13&14&15"])
             content += f'ADD ULDPLC:PROTOCOL="UDP",DSTCONN={br2},UPLC="LOADSHARE",UDPCONN={conn},NAME="{name}-绍兴";\n'
