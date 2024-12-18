@@ -18,6 +18,7 @@ from modules.position import Position
 from modules.ngn2ims import NGN2IMS
 from modules.addims import ADDIMS
 from modules.qrcode import QRCode
+from modules.location import Location
 
 
 def index():
@@ -35,6 +36,7 @@ def index():
     put_button("IMS 手工加号码脚本生成器", onclick=lambda: go_app("addims"), color=choice(colors))
     put_button("NGN 签转 IMS 脚本生成器", onclick=lambda: go_app("ngn2ims"), color=choice(colors))
     put_button("码化之二维码生成工具", onclick=lambda: go_app("qrcode"), color=choice(colors))
+    put_button("地理位置范围查询工具", onclick=lambda: go_app("location"), color=choice(colors))
 
 
 def callgroup():
@@ -81,6 +83,10 @@ def qrcode():
     QRCode()
 
 
+def location():
+    Location()
+
+
 def server():
     config(title="7086 工具箱", theme="minty")
 
@@ -98,6 +104,7 @@ def server():
             addims,
             ngn2ims,
             qrcode,
+            location,
         ],
         cdn=False,
         auto_open_webbrowser=True,
