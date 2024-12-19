@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import requests
-from pywebio.output import put_button, put_markdown, put_scope, put_text, use_scope
+from pywebio.output import put_button, put_markdown, put_scope, put_table, use_scope
 from pywebio.pin import pin, put_input
 
 
@@ -17,7 +17,8 @@ class Location:
         put_input(
             "location",
             label="中心位置经纬度",
-            placeholder="120,30",
+            placeholder="120.00,30.00",
+            help_text="经纬度用英文逗号隔开，小数最多6位。",
         )
         put_input(
             "radius",
@@ -34,23 +35,23 @@ class Location:
 
     @use_scope("output", clear=True)
     def update(self):
-        content = ""
+        content = [["名称", "地址", "区县", "城市"]]
         keyword = pin["keyword"].strip()
         location = pin["location"].strip()
         radius = pin["radius"].strip()
 
         KEY = "3252a68ab8715c2d869ffc388d9ce580"
-        url = f"https://restapi.amap.com/v5/place/around?key={KEY}&location={location}&keywords={keyword}&radius={radius}&output=json"
+        url = f"https://restapi.amap.com/v3/place/around?key={KEY}&location={location}&keywords={keyword}&radius={radius}&output=json"
         response = requests.get(url)
         data = response.json()
 
         if data["status"] == "1":
             for poi in data["pois"]:
-                content += f"名称: {poi['name']};\t地址: {poi['address']},{poi['adname']},{poi['cityname']}\n"
+                content += [[poi["name"], poi["address"], poi["adname"], poi["cityname"]]]
         else:
-            content += f"请求失败:, {data['info']}\n"
+            content += [[f"请求失败: {data['info']}"]]
 
-        put_text(content)
+        put_table(content)
 
 
 if __name__ == "__main__":
