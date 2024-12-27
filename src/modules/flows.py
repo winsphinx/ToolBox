@@ -12,11 +12,8 @@ from pywebio.pin import pin, put_file_upload
 
 def calculate_network(df):
     try:
-        if df["起始IP"].startswith("2408"):  # for ipv6
-            return ipaddress.ip_network(df["起始IP"])
-        else:  # for ipv4
-            for host in ipaddress.summarize_address_range(ipaddress.ip_address(df["起始IP"]), ipaddress.ip_address(df["终止IP"])):
-                return host
+        for host in ipaddress.summarize_address_range(ipaddress.ip_address(df["起始IP"]), ipaddress.ip_address(df["终止IP"])):
+            return host
     except ValueError:
         pass
 
@@ -26,7 +23,7 @@ class Flows:
         self.networks = None
         self.host = None
 
-        put_markdown("# 省际流量分析")
+        put_markdown("# 省际流量分析 - 互联网")
 
         put_file_upload(
             name="data_file",
@@ -58,7 +55,9 @@ class Flows:
         with put_loading():
             file = BytesIO(pin["data_file"]["content"])
             df_net = pd.read_excel(file)
-            df_net = df_net[["工程名称", "带宽", "所属节点", "起始IP", "终止IP", "BSS号码", "安装地址"]]
+            df_net = df_net[["工程名称", "带宽", "所属节点", "起始IPv4", "终止IPv4", "起始IPv6", "终止IPv6", "业务号码", "装机地址"]]
+            df_net["起始IP"] = df_net["起始IPv4"].fillna(df_net["起始IPv6"])
+            df_net["终止IP"] = df_net["终止IPv4"].fillna(df_net["终止IPv6"])
             df_net["网络"] = df_net.apply(calculate_network, axis=1)
 
         err = df_net[df_net["网络"].isnull()]
@@ -74,25 +73,28 @@ class Flows:
     def match_file(self):
         with put_loading():
             file = BytesIO(pin["host_file"]["content"])
-            df_host = pd.read_excel(file)
+            df_1 = pd.read_excel(file, sheet_name=0)
+            df_3 = pd.read_excel(file, sheet_name=2)
+
+            df_host = pd.concat([df_1, df_3])
+
             cols = df_host.columns.to_list()
 
             group_key = radio("选择作为分组依据的列名（单选）", cols, value=cols[2], required=True)
             cols.remove(group_key)
-            sum_keys = checkbox("选择要求和的列名（可多选）", cols)
-            df_host = df_host.groupby(by=[group_key]).agg({key: "sum" for key in sum_keys}).reset_index()
+            sort_keys = radio("选择要排序汇总的列名（单选）", cols, value=cols[-2], required=True)
+            df_host = df_host.groupby(by=[group_key]).sum().sort_values(by=[sort_keys]).reset_index().head(100)
 
-            content = f"{group_key},{','.join(sum_keys)},所属网络,工程名称,BSS号码\n"
+            content = f"{group_key},{sort_keys},所属网络,名称,业务号码,装机地址\n"
             for _, row in df_host.iterrows():
-                selected_row = ",".join([str(row[key]) for key in sum_keys if key in row])
                 for net in self.networks["网络"]:
                     ip = ipaddress.ip_address(row[group_key])
                     if ip in net:
-                        res = self.networks.loc[self.networks["网络"] == net, ["工程名称", "BSS号码"]].values[0]
-                        content += f"{row[group_key]},{selected_row},{str(net)},{res[0]},{str(res[1])}\n"
+                        res = self.networks.loc[self.networks["网络"] == net, ["工程名称", "业务号码", "装机地址"]].values[0]
+                        content += f"{row[group_key]},{row[sort_keys]},{str(net)},{res[0]},{str(res[1])},{res[2]}\n"
                         break
                 else:
-                    content += f"{row[group_key]},{selected_row},,我不是专线,\n"
+                    content += f"{row[group_key]},{row[sort_keys]},,我不是专线,,\n"
 
         put_file(
             "导出结果.csv",
