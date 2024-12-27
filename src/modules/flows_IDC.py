@@ -18,7 +18,7 @@ def calculate_network(df):
         pass
 
 
-class Flows:
+class Flows_IDC:
     def __init__(self):
         self.networks = None
         self.host = None
@@ -73,10 +73,10 @@ class Flows:
     def match_file(self):
         with put_loading():
             file = BytesIO(pin["host_file"]["content"])
-            df_1 = pd.read_excel(file, sheet_name=0)
-            df_3 = pd.read_excel(file, sheet_name=2)
+            df_2 = pd.read_excel(file, sheet_name=1)
+            df_4 = pd.read_excel(file, sheet_name=3)
 
-            df_host = pd.concat([df_1, df_3])
+            df_host = pd.concat([df_2, df_4])
 
             cols = df_host.columns.to_list()
 
@@ -97,11 +97,11 @@ class Flows:
                     content += f"{row[group_key]},{row[sort_keys]},,我不是专线,,\n"
 
         put_file(
-            "导出结果-城域网.csv",
+            "导出结果-IDC.csv",
             content.encode("utf-8-sig"),
             ">> 点击下载生成后的文件 <<",
         )
 
 
 if __name__ == "__main__":
-    Flows()
+    Flows_IDC()
