@@ -7,19 +7,19 @@ from pywebio import config, start_server
 from pywebio.output import put_button, put_markdown
 from pywebio.session import go_app
 
+from modules.addims import ADDIMS
 from modules.address import Address
 from modules.callgroup import Callgroup
-from modules.sipcall import Sipcall
-from modules.ipcal import IPcal
-from modules.reversepolarity import Reversepolarity
-from modules.sites import Sites
 from modules.flows import Flows
 from modules.flows_IDC import Flows_IDC
-from modules.position import Position
-from modules.ngn2ims import NGN2IMS
-from modules.addims import ADDIMS
-from modules.qrcode import QRCode
+from modules.ipcal import IPcal
 from modules.location import Location
+from modules.ngn2ims import NGN2IMS
+from modules.position import Position
+from modules.qrcode import QRCode
+from modules.reversepolarity import Reversepolarity
+from modules.sipcall import Sipcall
+from modules.sites import Sites
 
 
 def index():
@@ -33,7 +33,7 @@ def index():
     put_button("IP 地址——地理位置 查询工具", onclick=lambda: go_app("position"), color=choice(colors))
     put_button("地址——经纬度 查询工具", onclick=lambda: go_app("address"), color=choice(colors))
     put_button("基站稽核工具", onclick=lambda: go_app("sites"), color=choice(colors))
-    put_button("省际流量分析工具——互联网", onclick=lambda: go_app("flows"), color=choice(colors))
+    put_button("省际流量分析工具——城域网", onclick=lambda: go_app("flows"), color=choice(colors))
     put_button("省际流量分析工具——IDC", onclick=lambda: go_app("flows_idc"), color=choice(colors))
     put_button("IMS 手工加号码脚本生成器", onclick=lambda: go_app("addims"), color=choice(colors))
     put_button("NGN 签转 IMS 脚本生成器", onclick=lambda: go_app("ngn2ims"), color=choice(colors))

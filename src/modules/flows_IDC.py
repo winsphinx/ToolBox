@@ -23,7 +23,7 @@ class Flows_IDC:
         self.networks = None
         self.host = None
 
-        put_markdown("# 省际流量分析 - 互联网")
+        put_markdown("# 省际流量分析 - IDC")
 
         put_file_upload(
             name="data_file",
@@ -94,7 +94,7 @@ class Flows_IDC:
                         content += f"{row[group_key]},{row[sort_keys]},{str(net)},{res[0]},{str(res[1])},{res[2]}\n"
                         break
                 else:
-                    content += f"{row[group_key]},{row[sort_keys]},,我不是专线,,\n"
+                    content += f"{row[group_key]},{row[sort_keys]},,,,\n"
 
         put_file(
             "导出结果-IDC.csv",
