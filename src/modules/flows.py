@@ -5,7 +5,7 @@ import ipaddress
 from io import BytesIO
 
 import pandas as pd
-from pywebio.input import radio
+from pywebio.input import checkbox, radio
 from pywebio.output import put_button, put_file, put_html, put_loading, put_markdown, put_scope, use_scope
 from pywebio.pin import pin, put_file_upload
 
@@ -23,7 +23,7 @@ class Flows:
         self.networks = None
         self.host = None
 
-        put_markdown("# 省际流量分析 - 城域网")
+        put_markdown("# 省际流量分析")
 
         put_file_upload(
             name="data_file",
@@ -73,13 +73,11 @@ class Flows:
     def match_file(self):
         with put_loading():
             file = BytesIO(pin["host_file"]["content"])
-            df_1 = pd.read_excel(file, sheet_name=0)
-            df_3 = pd.read_excel(file, sheet_name=2)
-
-            df_host = pd.concat([df_1, df_3])
+            df_all = pd.read_excel(file, sheet_name=None)
+            sum_sheet = checkbox("选择要求和的列名（可多选）", [k for k in df_all.keys()])
+            df_host = pd.concat([df_all[x] for x in sum_sheet])
 
             cols = df_host.columns.to_list()
-
             group_key = radio("选择作为分组依据的列名（单选）", cols, value=cols[2], required=True)
             cols.remove(group_key)
             sort_keys = radio("选择要排序汇总的列名（单选）", cols, value=cols[-2], required=True)
@@ -97,7 +95,7 @@ class Flows:
                     content += f"{row[group_key]},{row[sort_keys]},,,,\n"
 
         put_file(
-            "导出结果-城域网.csv",
+            "导出结果.csv",
             content.encode("utf-8-sig"),
             ">> 点击下载生成后的文件 <<",
         )
