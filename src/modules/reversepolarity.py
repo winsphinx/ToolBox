@@ -14,7 +14,7 @@ class Reversepolarity:
             "numbers",
             label="号码",
             placeholder="sippstnuser add 0/2/1 0 telno 8657588111111\nsippstnuser add 0/2/4 0 telno 8657588222222\n...",
-            help_text="从 GPON 复制的数据，每行一个号码。",
+            help_text="从 GPON 复制的数据（进 esl user，运行 disp cu），每行一个号码。",
         )
         put_button(
             label="点击生成脚本",
@@ -33,20 +33,20 @@ class Reversepolarity:
             content += "esl user\n\n"
 
             for num, port in data:
-                content += f"sippstnuser rightflag set {port} telno {num} auto-reverse-polarity enable\n"
+                content += f"sippstnuser rightflag set {port} telno {num} auto-reverse-polarity enable\n\n"
             content += "\n"
 
             for _, port in data:
-                content += f"sippstnuser attribute set {port} potslinetype PayPhone\n"
+                content += f"sippstnuser attribute set {port} potslinetype PayPhone\n\n"
             content += "\nquit\n\npstnport\n\n"
 
             for _, port in data:
-                content += f"pstnport attribute set {port} clip-reverse-pole-pulse enable\n"
+                content += f"pstnport attribute set {port} clip-reverse-pole-pulse enable\n\n"
             content += "\nquit\n\nsave\n\n"
 
             content += "=" * 20 + "\n\tSSS\n" + "=" * 20 + "\n"
             for num, _ in data:
-                content += f'SET OSU SBR:PUI="tel:+{num}",USERTYPE="RVSPOL",CHARGCATEGORY="NORMAL";\n'
+                content += f'SET OSU SBR:PUI="tel:+{num}",USERTYPE="RVSPOL",CHARGCATEGORY="NORMAL";\n\n'
 
             put_text(content)
 
