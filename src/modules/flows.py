@@ -74,7 +74,7 @@ class Flows:
         with put_loading():
             file = BytesIO(pin["host_file"]["content"])
             df_all = pd.read_excel(file, sheet_name=None)
-            sum_sheet = checkbox("选择要求和的列名（可多选）", [k for k in df_all.keys()])
+            sum_sheet = checkbox("选择要汇总的子表（对于城域网选1+3，对于IDC选2+4）", [k for k in df_all.keys()])
             df_host = pd.concat([df_all[x] for x in sum_sheet])
 
             cols = df_host.columns.to_list()
