@@ -19,6 +19,7 @@ from modules.qrcode import QRCode
 from modules.reversepolarity import Reversepolarity
 from modules.sipcall import Sipcall
 from modules.sites import Sites
+from modules.roamusers import Roamusers
 
 
 def index():
@@ -37,6 +38,7 @@ def index():
     put_button("NGN 签转 IMS 脚本生成器", onclick=lambda: go_app("ngn2ims"), color=choice(colors))
     put_button("码化之二维码生成工具", onclick=lambda: go_app("qrcode"), color=choice(colors))
     put_button("地理位置范围查询工具", onclick=lambda: go_app("location"), color=choice(colors))
+    put_button("漫游用户统计工具", onclick=lambda: go_app("roamusers"), color=choice(colors))
 
 
 def callgroup():
@@ -87,6 +89,10 @@ def location():
     Location()
 
 
+def roamusers():
+    Roamusers()
+
+
 def server():
     config(title="7086 工具箱", theme="minty")
 
@@ -105,6 +111,7 @@ def server():
             ngn2ims,
             qrcode,
             location,
+            roamusers,
         ],
         cdn=False,
         auto_open_webbrowser=True,
