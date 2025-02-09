@@ -111,8 +111,8 @@ class Roamusers:
 
             os.remove("tmp.xlsx")
 
-        except Exception:
-            put_text("输入不规范，输出两行泪。")
+        except Exception as e:
+            put_text(f"输入不规范，输出两行泪。\n\n{e}")
 
 
 if __name__ == "__main__":
