@@ -70,12 +70,6 @@ SET OSU OIP:PUI="tel:+86575{telno}";
 
 
 *****************
-****   SDC   ****
-*****************
-MOD USR:MODE=BYDN,DN="{telno}",NEWLRN="116448{telno}",INCALLINGPREFIX=IN_1-0, INCALLEDPREFIX=IN_1-0;
-
-
-*****************
 ****   EDS   ****
 *****************
 优先级：10
@@ -84,6 +78,12 @@ MOD USR:MODE=BYDN,DN="{telno}",NEWLRN="116448{telno}",INCALLINGPREFIX=IN_1-0, IN
 名称：E2U+SIP
 正则表达式：!^.*$!sip:+86575{telno}@zj.ims.chinaunicom.cn!
 周期：3600000
+
+
+*****************
+****   SDC   ****
+*****************
+MOD USR:MODE=BYDN,DN="{telno}",NEWLRN="116448{telno}",INCALLINGPREFIX=IN_1-0, INCALLEDPREFIX=IN_1-0;
 
 
 *****************
