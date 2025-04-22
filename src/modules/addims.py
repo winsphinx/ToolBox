@@ -42,6 +42,8 @@ class ADDIMS:
             passwd = pin["passwd"].strip()
             ports = [s.strip() for s in pin["ports"].strip().split("\n")]
 
+            is_consistent = len(ports) == len(telnos)
+
             str_HSS = """
 *****************
 ****   HSS   ****
@@ -105,19 +107,25 @@ MOD USR:MODE=BYDN,DN="{telno}",NEWLRN="116448{telno}",INCALLINGPREFIX=IN_1-0, IN
 *****************
 ****   PON   ****
 *****************
-"""
-            for index, telno in enumerate(telnos):
-                str_PON += f"""
+
 esl user
+"""
+            content = str_HSS + str_SLF + str_SSS + str_EDS + str_SDC + str_PON
+
+            if is_consistent:
+                for index, telno in enumerate(telnos):
+                    content += f"""
 sippstnuser add {ports[index]} 0 telno 86575{telno}
 sippstnuser auth set {ports[index]} telno 86575{telno} password-mode password
 +86575{telno}@zj.ims.chinaunicom.cn
-{passwd} <- 密码
+{passwd}
 """
+            else:
+                content = "端口和号码数量不一致！"
 
-        content = str_HSS + str_SLF + str_SSS + str_EDS + str_SDC + str_PON
         put_text(content)
-        put_file(f"{telno}.txt", content.encode(), ">> 点击下载脚本 <<")
+        if is_consistent:
+            put_file(f"{'-'.join(telnos)}.txt", content.encode(), ">> 点击下载脚本 <<")
 
 
 if __name__ == "__main__":
