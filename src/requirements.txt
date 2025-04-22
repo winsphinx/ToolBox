@@ -2,5 +2,4 @@ pywebio
 pandas
 openpyxl
 requests
-ipaddress
 pillow
