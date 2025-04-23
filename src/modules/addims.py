@@ -100,7 +100,7 @@ SET OSU OIP:PUI="tel:+86575{telno}";
 *****************
 """
             for telno in telnos:
-                str_SDC += """
+                str_SDC += f"""
 MOD USR:MODE=BYDN,DN="{telno}",NEWLRN="116448{telno}",INCALLINGPREFIX=IN_1-0, INCALLEDPREFIX=IN_1-0;
 """
             str_PON = """
