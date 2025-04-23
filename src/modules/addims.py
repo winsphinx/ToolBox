@@ -92,7 +92,7 @@ SET OSU OIP:PUI="tel:+86575{telno}";
 名称：E2U+SIP
 正则表达式：!^.*$!sip:+86575{telno}@zj.ims.chinaunicom.cn!
 替换：留空
-周期：3600000
+周期：3600000   （不用数了，五个零）
 """
             str_SDC = """
 *****************
@@ -116,6 +116,7 @@ esl user
                 for index, telno in enumerate(telnos):
                     content += f"""
 sippstnuser add {ports[index]} 0 telno 86575{telno}
+
 sippstnuser auth set {ports[index]} telno 86575{telno} password-mode password
 +86575{telno}@zj.ims.chinaunicom.cn
 {passwd}
