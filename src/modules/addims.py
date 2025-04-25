@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from random import choice
 
-from pywebio.output import put_button, put_file, put_loading, put_markdown, put_scope, put_text, use_scope
+
+from pywebio.output import put_button, put_file, put_markdown, put_scope, put_text, use_scope
 from pywebio.pin import pin, put_input, put_textarea
 
 
@@ -36,14 +38,33 @@ class ADDIMS:
 
     @use_scope("output", clear=True)
     def update(self):
-        with put_loading():
-            put_text("开始生成脚本...")
-            telnos = [s.strip() for s in pin["telnos"].strip().split("\n")]
+        def validate_input():
+            import re
+
+            telnos = [s.strip() for s in pin["telnos"].strip().split("\n") if s.strip()]
             passwd = pin["passwd"].strip()
-            ports = [s.strip() for s in pin["ports"].strip().split("\n")]
+            ports = [s.strip() for s in pin["ports"].strip().split("\n") if s.strip()]
 
-            is_consistent = len(ports) == len(telnos)
+            if not all([telnos, passwd, ports]):
+                raise ValueError("号码、密码和端口为必填项。")
 
+            if any(not re.match(r"^\d{8}$", tel) for tel in telnos):
+                raise ValueError("号码必须为8位纯数字。")
+
+            if any(not re.match(r"^\d+/\d+/\d+$", p) for p in ports):
+                raise ValueError("端口格式应为 0/1/2 结构。")
+
+            if len(ports) != len(telnos):
+                raise ValueError("端口数量与号码数量不一致。")
+
+            return telnos, passwd, ports
+
+        try:
+            telnos, passwd, ports = validate_input()
+        except ValueError as e:
+            content = f"错误: {str(e)}"
+            put_text(content)
+        else:
             str_HSS = """
 *****************
 ****   HSS   ****
@@ -92,7 +113,7 @@ SET OSU OIP:PUI="tel:+86575{telno}";
 名称：E2U+SIP
 正则表达式：!^.*$!sip:+86575{telno}@zj.ims.chinaunicom.cn!
 替换：留空
-周期：3600000   （不用数了，五个零）
+周期：3600000    {choice(["（不用数了，五个零）", "", ""])}
 """
             str_SDC = """
 *****************
@@ -112,20 +133,16 @@ esl user
 """
             content = str_HSS + str_SLF + str_SSS + str_EDS + str_SDC + str_PON
 
-            if is_consistent:
-                for index, telno in enumerate(telnos):
-                    content += f"""
+            for index, telno in enumerate(telnos):
+                content += f"""
 sippstnuser add {ports[index]} 0 telno 86575{telno}
 
 sippstnuser auth set {ports[index]} telno 86575{telno} password-mode password
 +86575{telno}@zj.ims.chinaunicom.cn
 {passwd}
 """
-            else:
-                content = "端口和号码数量不一致！"
 
-        put_text(content)
-        if is_consistent:
+            put_text(content)
             put_file(f"{'-'.join(telnos)}.txt", content.encode(), ">> 点击下载脚本 <<")
 
 
