@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from random import choice
+from functools import partial
 
 from pywebio import config, start_server
 from pywebio.output import put_button, put_markdown
@@ -17,107 +18,59 @@ from modules.ngn2ims import NGN2IMS
 from modules.position import Position
 from modules.qrcode import QRCode
 from modules.reversepolarity import Reversepolarity
+from modules.roamusers import Roamusers
 from modules.sipcall import Sipcall
 from modules.sites import Sites
-from modules.roamusers import Roamusers
+
+# 每个字典包含：按钮名称(name), 应用名称(app), 对应的类(cls)
+TOOLS_CONFIG = [
+    {"name": "轮选组脚本生成器", "app": "callgroup", "cls": Callgroup},
+    {"name": "反极性脚本生成器", "app": "reversepolarity", "cls": Reversepolarity},
+    {"name": "SIP 数字中继脚本生成器", "app": "sipcall", "cls": Sipcall},
+    {"name": "IP 地址计算器", "app": "ipcal", "cls": IPcal},
+    {"name": "IP 地址——地理位置 查询工具", "app": "position", "cls": Position},
+    {"name": "地址——经纬度 查询工具", "app": "address", "cls": Address},
+    {"name": "基站稽核工具", "app": "sites", "cls": Sites},
+    {"name": "省际流量分析工具", "app": "flows", "cls": Flows},
+    {"name": "IMS 手工加号码脚本生成器", "app": "addims", "cls": ADDIMS},
+    {"name": "NGN 签转 IMS 脚本生成器", "app": "ngn2ims", "cls": NGN2IMS},
+    {"name": "码化之二维码生成工具", "app": "qrcode", "cls": QRCode},
+    {"name": "地理位置范围查询工具", "app": "location", "cls": Location},
+    {"name": "漫游用户统计工具", "app": "roamusers", "cls": Roamusers},
+]
+
+
+def create_app_handler(cls):
+    def handler():
+        cls()
+
+    return handler
 
 
 def index():
     put_markdown("# 七零八落工具箱")
 
     colors = ["primary", "secondary", "success", "danger", "warning", "info", "dark"]
-    put_button("轮选组脚本生成器", onclick=lambda: go_app("callgroup"), color=choice(colors))
-    put_button("反极性脚本生成器", onclick=lambda: go_app("reversepolarity"), color=choice(colors))
-    put_button("SIP 数字中继脚本生成器", onclick=lambda: go_app("sipcall"), color=choice(colors))
-    put_button("IP 地址计算器", onclick=lambda: go_app("ipcal"), color=choice(colors))
-    put_button("IP 地址——地理位置 查询工具", onclick=lambda: go_app("position"), color=choice(colors))
-    put_button("地址——经纬度 查询工具", onclick=lambda: go_app("address"), color=choice(colors))
-    put_button("基站稽核工具", onclick=lambda: go_app("sites"), color=choice(colors))
-    put_button("省际流量分析工具", onclick=lambda: go_app("flows"), color=choice(colors))
-    put_button("IMS 手工加号码脚本生成器", onclick=lambda: go_app("addims"), color=choice(colors))
-    put_button("NGN 签转 IMS 脚本生成器", onclick=lambda: go_app("ngn2ims"), color=choice(colors))
-    put_button("码化之二维码生成工具", onclick=lambda: go_app("qrcode"), color=choice(colors))
-    put_button("地理位置范围查询工具", onclick=lambda: go_app("location"), color=choice(colors))
-    put_button("漫游用户统计工具", onclick=lambda: go_app("roamusers"), color=choice(colors))
-
-
-def callgroup():
-    Callgroup()
-
-
-def reversepolarity():
-    Reversepolarity()
-
-
-def sipcall():
-    Sipcall()
-
-
-def ipcal():
-    IPcal()
-
-
-def address():
-    Address()
-
-
-def sites():
-    Sites()
-
-
-def flows():
-    Flows()
-
-
-def position():
-    Position()
-
-
-def addims():
-    ADDIMS()
-
-
-def ngn2ims():
-    NGN2IMS()
-
-
-def qrcode():
-    QRCode()
-
-
-def location():
-    Location()
-
-
-def roamusers():
-    Roamusers()
+    for tool in TOOLS_CONFIG:
+        put_button(tool["name"], onclick=partial(go_app, tool["app"]), color=choice(colors))
 
 
 def server():
     config(title="7086 工具箱", theme="minty")
 
     start_server(
-        [
-            index,
-            callgroup,
-            sipcall,
-            reversepolarity,
-            address,
-            ipcal,
-            sites,
-            flows,
-            position,
-            addims,
-            ngn2ims,
-            qrcode,
-            location,
-            roamusers,
-        ],
+        apps,
         cdn=False,
         auto_open_webbrowser=True,
         port=7086,
     )
 
+
+apps = {}
+for tool in TOOLS_CONFIG:
+    apps[tool["app"]] = create_app_handler(tool["cls"])
+
+apps["index"] = index
 
 if __name__ == "__main__":
     server()
