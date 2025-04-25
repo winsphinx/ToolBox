@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from random import choice
-
 
 from pywebio.output import put_button, put_file, put_markdown, put_scope, put_text, use_scope
 from pywebio.pin import pin, put_input, put_textarea
@@ -113,7 +111,7 @@ SET OSU OIP:PUI="tel:+86575{telno}";
 名称：E2U+SIP
 正则表达式：!^.*$!sip:+86575{telno}@zj.ims.chinaunicom.cn!
 替换：留空
-周期：3600000    {choice(["（不用数了，五个零）", "", ""])}
+周期：3600000
 """
             str_SDC = """
 *****************
