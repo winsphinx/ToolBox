@@ -22,7 +22,9 @@ from modules.roamusers import Roamusers
 from modules.sipcall import Sipcall
 from modules.sites import Sites
 
-# 每个字典包含：按钮名称(name), 应用名称(app), 对应的类(cls)
+COLORS = ["primary", "secondary", "success", "danger", "warning", "info", "dark"]
+
+# 工具字典。包含：按钮名称(name), 应用名称(app), 对应的类(cls)
 TOOLS_CONFIG = [
     {"name": "轮选组脚本生成器", "app": "callgroup", "cls": Callgroup},
     {"name": "反极性脚本生成器", "app": "reversepolarity", "cls": Reversepolarity},
@@ -40,37 +42,24 @@ TOOLS_CONFIG = [
 ]
 
 
-def create_app_handler(cls):
-    def handler():
-        cls()
-
-    return handler
+def create_app_class(cls):
+    return lambda: cls()
 
 
-def index():
+def create_app_index():
     put_markdown("# 七零八落工具箱")
-
-    colors = ["primary", "secondary", "success", "danger", "warning", "info", "dark"]
     for tool in TOOLS_CONFIG:
-        put_button(tool["name"], onclick=partial(go_app, tool["app"]), color=choice(colors))
+        put_button(tool["name"], onclick=partial(go_app, tool["app"]), color=choice(COLORS))
 
 
-def server():
+if __name__ == "__main__":
+    apps = {tool["app"]: create_app_class(tool["cls"]) for tool in TOOLS_CONFIG}
+    apps["index"] = create_app_index
+
     config(title="7086 工具箱", theme="minty")
-
     start_server(
         apps,
         cdn=False,
         auto_open_webbrowser=True,
         port=7086,
     )
-
-
-apps = {}
-for tool in TOOLS_CONFIG:
-    apps[tool["app"]] = create_app_handler(tool["cls"])
-
-apps["index"] = index
-
-if __name__ == "__main__":
-    server()
