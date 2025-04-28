@@ -62,7 +62,7 @@ class ADDIMS:
             content = f"# 错误\n{str(e)}"
             put_markdown(content)
         else:
-            str_HSS = "## HSS\n```\n"
+            str_HSS = "## HSS\n```"
             for telno in telnos:
                 str_HSS += f"""
 ADD NEWPVI:PVITYPE=0,PVI=+86575{telno}@zj.ims.chinaunicom.cn,IREGFLAG=1,IDENTITYTYPE=0,PECFN=ccf01.zj.ims.chinaunicom.cn,SECFN=ccf02.zj.ims.chinaunicom.cn,PCCFN=ccf01.zj.ims.chinaunicom.cn,SCCFN=ccf02.zj.ims.chinaunicom.cn,SecVer=30,UserName=+86575{telno}@zj.ims.chinaunicom.cn,PassWord={passwd},Realm=zj.ims.chinaunicom.cn,ACCTypeList=*,ACCInfoList=*,ACCValueList=*;
@@ -73,19 +73,19 @@ MOD PUIINFO:PUI=sip:+86575{telno}@zj.ims.chinaunicom.cn,LOCALINFO=,LOOSEROUTEIND
 SET IMPREGSET:PUIList=sip:+86575{telno}@zj.ims.chinaunicom.cn$tel:+86575{telno},DefaultPUI=sip:+86575{telno}@zj.ims.chinaunicom.cn;
 SET ALIASEGROUP:PUIList=sip:+86575{telno}@zj.ims.chinaunicom.cn$tel:+86575{telno},AliasGroupID=+86575{telno}@zj.ims.chinaunicom.cn;
 """
-            str_SLF = "\n```\n## SLF\n```\n"
+            str_SLF = "```\n\n## SLF\n```"
             for telno in telnos:
                 str_SLF += f"""
 ADD SLFUSER:USERIDTYPE=1,USERID=tel:+86575{telno},HSSID=1;
 ADD SLFUSER:USERIDTYPE=1,USERID=sip:+86575{telno}@zj.ims.chinaunicom.cn,HSSID=1;
 """
-            str_SSS = "\n```\n## SSS\n```\n"
+            str_SSS = "```\n\n## SSS\n```"
             for telno in telnos:
                 str_SSS += f"""
 ADD OSU SBR:PUI="tel:+86575{telno}",NETTYPE=1,CC=86,LATA=575,TYPE="IMS",ONLCHG="OFF",OFFLCHG="ON",NOTOPEN="OFF",OWE="OFF",TSS="TSS_OFF",IRCFS="ON",IRACFSC="OFF",NSOUTG="OFF",NSICO="OFF",CARDUSER="OFF",FORCEOL="OFF",OVLAP="OFF",CFFT="OFF",CORHT="LC"&"DDD"&"SPCS"&"HF"&"LT",CIRHT="LC"&"DDD"&"IDD"&"SPCS"&"HF"&"HKMACAOTW"&"LT",OWECIRHT="LC"&"DDD"&"IDD"&"SPCS"&"HF"&"HKMACAOTW"&"LT",CTXOUTRHT="GRPIN"&"GRPOUT"&"GRPOUTNUM",CTXINRHT="GRPIN"&"GRPOUT"&"GRPOUTNUM",OWECTXOUTRHT="GRPIN"&"GRPOUT"&"GRPOUTNUM",OWECTXINRHT="GRPIN"&"GRPOUT"&"GRPOUTNUM",ACOFAD="57501",COMCODE=0,CUSTYPE="B2C",LANGTYPE=0,SPELINE="NO",CALLERAS=0,CALLEDAS=0,CHARGCATEGORY="FREE",CPC=0,PREPAIDTYPE="0",MAXCOMNUM=1,MEDIACAPNO=0,ZONEINDEX=65535,IMSUSERTYPE="NMIMS",OUTGOINGBLACK="NO",NOANSWERTIMER=0,OPSMSININDEX=0;
 SET OSU OIP:PUI="tel:+86575{telno}";
 """
-            str_EDS = "\n```\n## EDS\n```\n"
+            str_EDS = "```\n\n## EDS\n```"
             for telno in telnos:
                 str_EDS += f"""
 优先级：10
@@ -96,12 +96,12 @@ SET OSU OIP:PUI="tel:+86575{telno}";
 替换：留空
 周期：3600000
 """
-            str_SDC = "\n```\n## SDC\n```\n"
+            str_SDC = "```\n\n## SDC\n```"
             for telno in telnos:
                 str_SDC += f"""
 MOD USR:MODE=BYDN,DN="{telno}",NEWLRN="116448{telno}",INCALLINGPREFIX=IN_1-0, INCALLEDPREFIX=IN_1-0;
 """
-            str_PON = "\n```\n## PON\n```\nesl user\n"
+            str_PON = "```\n\n## PON\n```\nesl user\n"
             content = str_HSS + str_SLF + str_SSS + str_EDS + str_SDC + str_PON
 
             for index, telno in enumerate(telnos):
@@ -112,7 +112,7 @@ sippstnuser auth set {ports[index]} telno 86575{telno} password-mode password
 +86575{telno}@zj.ims.chinaunicom.cn
 {passwd}
 """
-            content += "\n```\n"
+            content += "```\n"
 
             put_markdown(content)
             put_file(f"{'-'.join(telnos)}.md", content.encode(), ">> 点击下载脚本 <<")
