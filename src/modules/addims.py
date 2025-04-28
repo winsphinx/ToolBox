@@ -89,7 +89,7 @@ SET OSU OIP:PUI="tel:+86575{telno}";
             str_EDS = "```\n\n## EDS\n```"
             for telno in telnos:
                 str_EDS += f"""
-Add NAPTRRec:E164NUM=575{telno},ZONENAME=6.8.e164.arpa,ORDER=10,PREFERENCE=100,FLAGS=U,SERVICE=E2U+sip,REGEXP=!%5E.*%24!sip:+86575{telno}@zj.ims.chinaunicom.cn!,TTL=0;
+Add NAPTRRec:E164NUM=575{telno},ZONENAME=6.8.e164.arpa,ORDER=10,PREFERENCE=100,FLAGS=U,SERVICE=E2U+SIP,REGEXP=!%5E.*%24!sip:+86575{telno}@zj.ims.chinaunicom.cn!,TTL=3600000;
 """
             str_SDC = "```\n\n## SDC\n```"
             for telno in telnos:
@@ -130,7 +130,7 @@ pre {
     background-color: #f0f0f0; /* 背景色 */
     color: #333;          /* 文字颜色 */
     cursor: pointer;       /* 鼠标悬停时显示手型光标 */
-    font-size: 0.8em;      /* 字体大小 */
+    font-size: 0.9em;      /* 字体大小 */
     opacity: 0.7;          /* 默认透明度，使其不那么显眼 */
     transition: opacity 0.2s, background-color 0.2s; /* 过渡效果 */
     z-index: 1;            /* 确保按钮在代码之上 */
@@ -165,7 +165,7 @@ pre {
         const button = document.createElement('button');
         button.className = 'copy-code-button'; // 应用 CSS 类
         button.textContent = '复制';           // 按钮默认文字
-        button.title = '复制代码';             // 鼠标悬停提示文字
+        button.title = '复制数据';             // 鼠标悬停提示文字
 
         // 为按钮添加点击事件监听器
         button.addEventListener('click', (event) => {
@@ -185,7 +185,7 @@ pre {
                 setTimeout(() => {
                     button.textContent = '复制';     // 恢复文字
                     button.classList.remove('copied'); // 移除 'copied' 类
-                }, 2000);
+                }, 1000);
             }).catch(err => {
                 // 复制失败后的操作
                 button.textContent = '失败'; // 提示用户复制失败
@@ -194,7 +194,7 @@ pre {
                 // 同样设置延时恢复按钮状态
                  setTimeout(() => {
                     button.textContent = '复制';
-                }, 2000);
+                }, 1000);
             });
         });
 
