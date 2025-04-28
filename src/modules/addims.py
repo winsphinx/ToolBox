@@ -89,13 +89,7 @@ SET OSU OIP:PUI="tel:+86575{telno}";
             str_EDS = "```\n\n## EDS\n```"
             for telno in telnos:
                 str_EDS += f"""
-优先级：10
-次优先级：100
-标识：URI
-名称：E2U+SIP
-正则表达式：!^.*$!sip:+86575{telno}@zj.ims.chinaunicom.cn!
-替换：留空
-周期：3600000
+Add NAPTRRec:E164NUM=575{telno},ZONENAME=6.8.e164.arpa,ORDER=10,PREFERENCE=100,FLAGS=U,SERVICE=E2U+sip,REGEXP=!%5E.*%24!sip:+86575{telno}@zj.ims.chinaunicom.cn!,TTL=0;
 """
             str_SDC = "```\n\n## SDC\n```"
             for telno in telnos:
