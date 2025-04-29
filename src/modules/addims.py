@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import re
+import time
 
 from pywebio.output import put_button, put_file, put_html, put_markdown, put_scope, use_scope
 from pywebio.pin import pin, put_input, put_textarea
@@ -209,7 +210,8 @@ sippstnuser auth set {ports[index]} telno 86575{telno} password-mode password
             # 调用函数添加按钮
             add_copy_button_to_code_blocks()
 
-            put_file(f"{'-'.join(telnos)}.md", content.encode(), ">> 点击下载脚本 <<")
+            day = time.strftime("%Y-%m-%d", time.localtime(time.time()))
+            put_file(f"{day}.md", content.encode(), ">> 点击下载脚本 <<")
 
 
 if __name__ == "__main__":
