@@ -29,7 +29,7 @@ class Reversepolarity:
             numbers = [s.strip() for s in pin["numbers"].strip().split("\n")]
             data = [(x.split()[5], x.split()[2]) for x in numbers]
 
-            content = "=" * 20 + "\n\tPON\n" + "=" * 20 + "\n"
+            content = "## PON\n```"
             content += "esl user\n\n"
 
             for num, port in data:
@@ -44,11 +44,13 @@ class Reversepolarity:
                 content += f"pstnport attribute set {port} clip-reverse-pole-pulse enable\n\n"
             content += "\nquit\n\nsave\n\n"
 
-            content += "=" * 20 + "\n\tSSS\n" + "=" * 20 + "\n"
+            content += "```\n\n## SSS\n```\n"
             for num, _ in data:
                 content += f'SET OSU SBR:PUI="tel:+{num}",USERTYPE="RVSPOL",CHARGCATEGORY="NORMAL";\n\n'
 
-            put_text(content)
+            content += "```\n"
+
+            put_markdown(content)
 
             day = time.strftime("%Y-%m-%d", time.localtime(time.time()))
             put_file(f"{day}.txt", content.encode(), ">> 点击下载脚本 <<")
