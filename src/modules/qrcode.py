@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os
-import shutil
 import time
 import zipfile
 from io import BytesIO
@@ -12,15 +10,8 @@ from pywebio.output import put_button, put_file, put_loading, put_markdown, put_
 from pywebio.pin import pin, put_file_upload
 
 
-def read_inputs(dir):
-    filelist = []
-    for filename in os.listdir(dir):
-        if os.path.splitext(filename)[1] == ".png":
-            filelist.append(filename)
-    return filelist
-
-
-def put_picture(filelist):
+def put_picture(png_data_list):
+    output_buffers = []
     # 创建整体图层大小为 A4 纸
     dpi = 300
     w, h = 210, 297
@@ -32,19 +23,28 @@ def put_picture(filelist):
     m = int(m * dpi / 25.4)
     n = int(n * dpi / 25.4)
 
-    for f in range(0, len(filelist), 45):
+    for f in range(0, len(png_data_list), 45):
         image = Image.new("RGB", (w, h), "white")
 
-        chunk = filelist[f:f + 45]
+        chunk = png_data_list[f:f + 45]
         for i in range(len(chunk)):
             # 左上角坐标 (x, y)
             col = i % 5
             row = i // 5
             x, y = 50 + col * 500, 70 + row * 383
-            overlay = Image.open(os.path.join("inputs", chunk[i])).resize((m, n))
-            image.paste(overlay, (x, y))
+            try:
+                chunk[i].seek(0)
+                overlay = Image.open(chunk[i]).convert("RGBA").resize((m, n))
+                image.paste(overlay, (x, y))
+            except Exception:
+                pass
 
-        image.save(os.path.join("outputs", f"qrcode_{f//45}.png"))
+        output_image_buffer = BytesIO()
+        image.save(output_image_buffer, format="PNG")
+        output_image_buffer.seek(0)
+        output_buffers.append(output_image_buffer)
+
+    return output_buffers
 
 
 class QRCode:
@@ -69,29 +69,42 @@ class QRCode:
     @use_scope("output", clear=True)
     def make_file(self):
         with put_loading():
-            os.makedirs("inputs", exist_ok=True)
-            os.makedirs("outputs", exist_ok=True)
+            try:
+                input_zip_content = pin["zip_file"]["content"]
+                input_zip_buffer = BytesIO(input_zip_content)
+                png_data_list = []
 
-            zip_file = BytesIO(pin["zip_file"]["content"])
-            zipfile.ZipFile(zip_file, "r").extractall("inputs")
-            files = read_inputs("inputs")
+                with zipfile.ZipFile(input_zip_buffer, "r") as zf:
+                    for filename in zf.namelist():
+                        if filename.lower().endswith(".png"):
+                            png_data = zf.read(filename)
+                            png_data_list.append(BytesIO(png_data))
 
-            put_picture(files)
+                if len(png_data_list):
+                    output_zip_buffer = BytesIO()
+                    output_image_buffers = put_picture(png_data_list)
 
-            with zipfile.ZipFile("qrcodes.zip", "w", zipfile.ZIP_DEFLATED) as f:
-                for file in os.listdir("outputs"):
-                    if os.path.splitext(file)[1] == ".png":
-                        f.write(os.path.join("outputs", file), file)
+                    with zipfile.ZipFile(output_zip_buffer, "w", zipfile.ZIP_DEFLATED) as zf_out:
+                        for i, img_buffer in enumerate(output_image_buffers):
+                            img_buffer.seek(0)
+                            zf_out.writestr(f"qrcode_{i}.png", img_buffer.read())
 
-            shutil.rmtree("inputs")
-            shutil.rmtree("outputs")
+                    output_zip_buffer.seek(0)
 
-        put_file(
-            f"QRCode-{time.strftime('%Y%m%d%H%M', time.localtime(time.time()))}.zip",
-            open("qrcodes.zip", "rb").read(),
-            ">> 点击下载生成后的文件 <<",
-        )
-        os.remove("qrcodes.zip")
+                else:
+                    content = "压缩包内没有图片文件，请检查文件格式！"
+
+            except TypeError:
+                content = "没有找到文件！请上传！"
+
+        try:
+            put_file(
+                f"QRCode-{time.strftime('%Y%m%d%H%M', time.localtime(time.time()))}.zip",
+                output_zip_buffer.getvalue(),
+                ">> 点击下载生成后的文件 <<",
+            )
+        except UnboundLocalError:
+            put_markdown(content)
 
 
 if __name__ == "__main__":
