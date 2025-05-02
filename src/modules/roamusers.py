@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os
 from io import BytesIO
 
 import pandas as pd
@@ -103,13 +102,10 @@ class Roamusers:
                 res = res.drop(columns=["手机号码", "运营商", "svc_num"])
                 res = res.rename(columns={"PROV_ID_NAME": "目前省份", "AREA_DESC": "目前地市"})
 
-                res.to_excel("tmp.xlsx", sheet_name="Sheet1", index=False)
-
-            with open("tmp.xlsx", "rb") as f:
-                content = f.read()
+                output_buffer = BytesIO()
+                res.to_excel(output_buffer, sheet_name="Sheet1", index=False)
+                content = output_buffer.getvalue()
                 put_file("output.xlsx", content, ">> 点击下载生成后的文件 <<")
-
-            os.remove("tmp.xlsx")
 
         except Exception as e:
             put_text(f"输入不规范，输出两行泪。\n\n{e}")
