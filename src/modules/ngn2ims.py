@@ -56,6 +56,8 @@ vlan 101 smart
 
 protocol-8021p-pri 6 vlan 101
 
+port vlan 101 0/0 0
+
 port vlan 101 0/0 1
 
 interface vlanif 101

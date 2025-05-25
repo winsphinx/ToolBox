@@ -213,7 +213,7 @@ class Sipcall:
             content += f'ADD NH RADDR:NHID={nexthop},IPADDR="{ip}",PREFIX=32;\n'
             content += f'SET NH SUB:NHID={nexthop},SIPTR="ENABLE";\n'
             content += "//最大并发数配置\n"
-            content += f'ADD CAC PROFILE:CACPROFILEID={cac},CPDESC="{name}并发数",UGCALLTIME=10,UGCALLNUM={ceil(max/100*15)},UGMAXCALLNUM={max};\n'
+            content += f'ADD CAC PROFILE:CACPROFILEID={cac},CPDESC="{name}并发数",UGCALLTIME=10,UGCALLNUM={ceil(max / 100 * 15)},UGMAXCALLNUM={max};\n'
             content += f'ADD INST CACRULE:INSTID={cac},CACRULEID={cac},DESC="{name}";\n'
             content += f'ADD POLICY GROUP:PLGID={cac},FSTLISTID=1,DSCP="{name}";\n'
             content += f'ADD POLICY LIST:PLGID={cac},LISTID=1,DSCP="{name}";\n'
@@ -299,7 +299,7 @@ class Sipcall:
             for n in sub_numbers:
                 CALLRITID = {"对等方式": 19, "签约方式": 200}.get(mode, None)
                 content += f'ADD AUTH:DAS={auth},DIGIT="{n}",CALLRITID={CALLRITID},VALIDLEN={len(n)},NAME="{name}-绍兴";\n'
-                content += f'ADD AUTH:DAS={auth},DIGIT="0086575{n}",CALLRITID={CALLRITID},VALIDLEN={len(n)+7},NAME="{name}-绍兴";\n'
+                content += f'ADD AUTH:DAS={auth},DIGIT="0086575{n}",CALLRITID={CALLRITID},VALIDLEN={len(n) + 7},NAME="{name}-绍兴";\n'
             content += "//落地数据配置\n"
             OPT = '"NCEL"&"TCUG"&"HDRTT"&"BODYTT"&"SEND_CCL"'
             for n in sub_numbers:
