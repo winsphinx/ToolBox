@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from random import choice
 from functools import partial
+from random import choice
 
 from pywebio import config, start_server
 from pywebio.output import put_button, put_markdown

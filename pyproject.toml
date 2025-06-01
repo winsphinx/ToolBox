@@ -1,5 +1,17 @@
-[tool.black]
-line-length = 1080
+[project]
+name = "ToolBox"
+version = "0.1.0"
+description = "Tool box"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "pywebio>=1.8.4",
+    "pandas>=2.2.3",
+    "openpyxl>=3.1.5",
+    "requests>=2.32.3",
+    "pillow>=1.8.4",
+]
 
 [tool.ruff]
 line-length = 1080
+lint.extend-select = ["I"]
