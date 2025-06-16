@@ -207,7 +207,7 @@ class Sipcall:
             for n in sub_numbers:
                 content += f'ADD USR:DN="{n}",LRN="116448{n}",USRTYPE=NGN,LOCZCIDX=5,AREAIDX=5;\n'
 
-            content += "\n\n" + "*" * 20 + "\n\tISBC03\n" + "*" * 20 + "\n"
+            content += "\n\n" + "*" * 20 + f"\n\t{isbc_number}\n" + "*" * 20 + "\n"
             content += "//增加下一跳地址\n"
             content += f'ADD NH BASIC:NHID={nexthop},DESC="{name}",IPADDRESS="{ip}";\n'
             content += f'ADD NH RADDR:NHID={nexthop},IPADDR="{ip}",PREFIX=32;\n'
