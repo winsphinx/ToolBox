@@ -42,10 +42,6 @@ TOOLS_CONFIG = [
 ]
 
 
-def create_app_class(cls):
-    return lambda: cls()
-
-
 def create_app_index():
     put_markdown("# 七零八落工具箱")
     for tool in TOOLS_CONFIG:
@@ -53,13 +49,13 @@ def create_app_index():
 
 
 if __name__ == "__main__":
-    apps = {tool["app"]: create_app_class(tool["cls"]) for tool in TOOLS_CONFIG}
+    apps = {tool["app"]: (lambda cls=tool["cls"]: lambda: cls())() for tool in TOOLS_CONFIG}
     apps["index"] = create_app_index
 
     config(title="7086 工具箱", theme="minty")
     start_server(
         apps,
-        cdn=False,
+        cdn=True,
         auto_open_webbrowser=True,
         port=7086,
     )
