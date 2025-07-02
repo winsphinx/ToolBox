@@ -6,7 +6,7 @@ from pywebio.output import put_button, put_file, put_loading, put_markdown, put_
 from pywebio.pin import pin, put_input, put_radio
 
 
-class NGN2IMS:
+class Ngn2IMS:
     def __init__(self):
         put_markdown("# NGN->IMS 脚本生成器")
         put_radio(
@@ -136,4 +136,4 @@ save
 
 
 if __name__ == "__main__":
-    NGN2IMS()
+    Ngn2IMS()

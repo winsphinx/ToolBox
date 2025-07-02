@@ -104,7 +104,7 @@ pre {
     )
 
 
-class ADDIMS:
+class AddIMS:
     def __init__(self):
         put_markdown("# 手工IMS加号码脚本生成器")
         put_textarea(
@@ -215,4 +215,4 @@ sippstnuser auth set {ports[index]} telno 86575{telno} password-mode password
 
 
 if __name__ == "__main__":
-    ADDIMS()
+    AddIMS()

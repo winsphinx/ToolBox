@@ -8,13 +8,13 @@ from pywebio import config, start_server
 from pywebio.output import put_button, put_markdown
 from pywebio.session import go_app
 
-from modules.addims import ADDIMS
+from modules.addims import AddIMS
 from modules.address import Address
 from modules.callgroup import Callgroup
 from modules.flows import Flows
 from modules.ipcal import IPcal
 from modules.location import Location
-from modules.ngn2ims import NGN2IMS
+from modules.ngn2ims import Ngn2IMS
 from modules.position import Position
 from modules.qrcode import QRCode
 from modules.reversepolarity import Reversepolarity
@@ -34,8 +34,8 @@ TOOLS_CONFIG = [
     {"name": "地址——经纬度 查询工具", "app": "address", "cls": Address},
     {"name": "基站稽核工具", "app": "sites", "cls": Sites},
     {"name": "省际流量分析工具", "app": "flows", "cls": Flows},
-    {"name": "IMS 手工加号码脚本生成器", "app": "addims", "cls": ADDIMS},
-    {"name": "NGN 签转 IMS 脚本生成器", "app": "ngn2ims", "cls": NGN2IMS},
+    {"name": "IMS 手工加号码脚本生成器", "app": "addims", "cls": AddIMS},
+    {"name": "NGN 签转 IMS 脚本生成器", "app": "ngn2ims", "cls": Ngn2IMS},
     {"name": "码化之二维码生成工具", "app": "qrcode", "cls": QRCode},
     {"name": "地理位置范围查询工具", "app": "location", "cls": Location},
     {"name": "漫游用户统计工具", "app": "roamusers", "cls": Roamusers},

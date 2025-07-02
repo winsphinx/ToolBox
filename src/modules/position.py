@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import requests
-from pywebio.output import put_button, put_markdown, put_loading, put_scope, put_text, use_scope
+from pywebio.output import put_button, put_loading, put_markdown, put_scope, put_text, use_scope
 from pywebio.pin import pin, put_textarea
 
 
