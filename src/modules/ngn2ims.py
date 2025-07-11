@@ -43,7 +43,16 @@ class Ngn2IMS:
             name = pin["name"].strip()
             TXT = f"""
 ring check enable
+
 autosave interval on
+
+snmp-agent target-host trap-hostname NCE_P address 10.17.254.41 udp-port  162 trap-paramsname NCE_P
+
+snmp-agent target-host trap-hostname NCE_S address 10.17.254.72 udp-port  162 trap-paramsname NCE_S
+
+snmp-agent target-host trap-paramsname NCE_P v1 securityname private
+
+snmp-agent target-host trap-paramsname NCE_S v1 securityname private
 
 local-digitmap delete all
 y
