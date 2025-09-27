@@ -5,7 +5,7 @@ import re
 import time
 
 from pywebio.output import put_button, put_file, put_html, put_markdown, put_scope, use_scope
-from pywebio.pin import pin, put_input, put_textarea
+from pywebio.pin import pin, put_input, put_radio, put_textarea
 from pywebio.session import run_js
 
 
@@ -107,6 +107,19 @@ pre {
 class AddIMS:
     def __init__(self):
         put_markdown("# 手工IMS加号码脚本生成器")
+        put_radio(
+            "area",
+            label="区县",
+            options=[
+                {"label": "越城", "value": "01"},
+                {"label": "上虞", "value": "02"},
+                {"label": "嵊州", "value": "03"},
+                {"label": "新昌", "value": "04"},
+                {"label": "诸暨", "value": "05"},
+                {"label": "柯桥", "value": "06"},
+            ],
+            inline=True,
+        )
         put_textarea(
             "telnos",
             label="号码",
@@ -138,6 +151,7 @@ class AddIMS:
             telnos = [s.strip() for s in pin["telnos"].strip().split("\n") if s.strip()]
             passwd = pin["passwd"].strip()
             ports = [s.strip() for s in pin["ports"].strip().split("\n") if s.strip()]
+            area = pin["area"]
 
             if not all([telnos, passwd, ports]):
                 raise ValueError("号码、密码和端口为必填项。")
@@ -151,10 +165,10 @@ class AddIMS:
             if len(ports) != len(telnos):
                 raise ValueError("端口数量与号码数量不一致。")
 
-            return telnos, passwd, ports
+            return telnos, passwd, ports, area
 
         try:
-            telnos, passwd, ports = validate_input()
+            telnos, passwd, ports, area = validate_input()
         except ValueError as e:
             content = f"# 错误\n{str(e)}"
             put_markdown(content)
@@ -179,7 +193,7 @@ ADD SLFUSER:USERIDTYPE=1,USERID=sip:+86575{telno}@zj.ims.chinaunicom.cn,HSSID=1;
             str_SSS = "```\n\n## SSS\n```"
             for telno in telnos:
                 str_SSS += f"""
-ADD OSU SBR:PUI="tel:+86575{telno}",NETTYPE=1,CC=86,LATA=575,TYPE="IMS",ONLCHG="OFF",OFFLCHG="ON",NOTOPEN="OFF",OWE="OFF",TSS="TSS_OFF",IRCFS="ON",IRACFSC="OFF",NSOUTG="OFF",NSICO="OFF",CARDUSER="OFF",FORCEOL="OFF",OVLAP="OFF",CFFT="OFF",CORHT="LC"&"DDD"&"SPCS"&"HF"&"LT",CIRHT="LC"&"DDD"&"IDD"&"SPCS"&"HF"&"HKMACAOTW"&"LT",OWECIRHT="LC"&"DDD"&"IDD"&"SPCS"&"HF"&"HKMACAOTW"&"LT",CTXOUTRHT="GRPIN"&"GRPOUT"&"GRPOUTNUM",CTXINRHT="GRPIN"&"GRPOUT"&"GRPOUTNUM",OWECTXOUTRHT="GRPIN"&"GRPOUT"&"GRPOUTNUM",OWECTXINRHT="GRPIN"&"GRPOUT"&"GRPOUTNUM",ACOFAD="57501",COMCODE=0,CUSTYPE="B2C",LANGTYPE=0,SPELINE="NO",CALLERAS=0,CALLEDAS=0,CHARGCATEGORY="FREE",CPC=0,PREPAIDTYPE="0",MAXCOMNUM=1,MEDIACAPNO=0,ZONEINDEX=65535,IMSUSERTYPE="NMIMS",OUTGOINGBLACK="NO",NOANSWERTIMER=0,OPSMSININDEX=0;
+ADD OSU SBR:PUI="tel:+86575{telno}",NETTYPE=1,CC=86,LATA=575,TYPE="IMS",ONLCHG="OFF",OFFLCHG="ON",NOTOPEN="OFF",OWE="OFF",TSS="TSS_OFF",IRCFS="ON",IRACFSC="OFF",NSOUTG="OFF",NSICO="OFF",CARDUSER="OFF",FORCEOL="OFF",OVLAP="OFF",CFFT="OFF",CORHT="LC"&"DDD"&"SPCS"&"HF"&"LT",CIRHT="LC"&"DDD"&"IDD"&"SPCS"&"HF"&"HKMACAOTW"&"LT",OWECIRHT="LC"&"DDD"&"IDD"&"SPCS"&"HF"&"HKMACAOTW"&"LT",CTXOUTRHT="GRPIN"&"GRPOUT"&"GRPOUTNUM",CTXINRHT="GRPIN"&"GRPOUT"&"GRPOUTNUM",OWECTXOUTRHT="GRPIN"&"GRPOUT"&"GRPOUTNUM",OWECTXINRHT="GRPIN"&"GRPOUT"&"GRPOUTNUM",ACOFAD="575{area}",COMCODE=0,CUSTYPE="B2C",LANGTYPE=0,SPELINE="NO",CALLERAS=0,CALLEDAS=0,CHARGCATEGORY="FREE",CPC=0,PREPAIDTYPE="0",MAXCOMNUM=1,MEDIACAPNO=0,ZONEINDEX=65535,IMSUSERTYPE="NMIMS",OUTGOINGBLACK="NO",NOANSWERTIMER=0,OPSMSININDEX=0;
 SET OSU OIP:PUI="tel:+86575{telno}";
 """
             str_EDS = "```\n\n## EDS\n```"
