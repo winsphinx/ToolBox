@@ -14,6 +14,7 @@ from modules.callgroup import Callgroup
 from modules.flows import Flows
 from modules.ipcal import IPcal
 from modules.location import Location
+from modules.mobaxterm import Mobaxterm
 from modules.ngn2ims import Ngn2IMS
 from modules.position import Position
 from modules.qrcode import QRCode
@@ -39,6 +40,7 @@ TOOLS_CONFIG = [
     {"name": "码化之二维码生成工具", "app": "qrcode", "cls": QRCode},
     {"name": "地理位置范围查询工具", "app": "location", "cls": Location},
     {"name": "漫游用户统计工具", "app": "roamusers", "cls": Roamusers},
+    {"name": "MobaXterm 注册工具", "app": "mobaxterm", "cls": Mobaxterm},
 ]
 
 
