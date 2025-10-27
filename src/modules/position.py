@@ -28,7 +28,7 @@ class Position:
             content = ""
 
             if pin["ip"]:
-                ips = [s.strip() for s in pin["ip"].strip().split("\n")]
+                ips = [s.strip() for s in str(pin["ip"]).strip().split("\n")]
                 url = "http://ip-api.com/batch?lang=zh-CN"
                 response = requests.post(url, json=ips)
 

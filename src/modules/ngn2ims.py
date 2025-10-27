@@ -40,7 +40,7 @@ class Ngn2IMS:
         with put_loading():
             put_text("开始生成脚本...")
             area = pin["area"]
-            name = pin["name"].strip()
+            name = str(pin["name"]).strip()
             TXT = f"""
 ring check enable
 

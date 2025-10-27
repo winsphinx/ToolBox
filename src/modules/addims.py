@@ -148,9 +148,9 @@ class AddIMS:
     @use_scope("output", clear=True)
     def update(self):
         def validate_input():
-            telnos = [s.strip() for s in pin["telnos"].strip().split("\n") if s.strip()]
-            passwd = pin["passwd"].strip()
-            ports = [s.strip() for s in pin["ports"].strip().split("\n") if s.strip()]
+            telnos = [s.strip() for s in str(pin["telnos"]).strip().split("\n") if s.strip()]
+            passwd = str(pin["passwd"]).strip()
+            ports = [s.strip() for s in str(pin["ports"]).strip().split("\n") if s.strip()]
             area = pin["area"]
 
             if not all([telnos, passwd, ports]):

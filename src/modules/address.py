@@ -26,6 +26,7 @@ class Address:
                     label="点击这里，根据地址查询经纬度",
                     onclick=self.query_address,
                 ),
+                None,
                 put_button(
                     label="点击这里，根据经纬度查询地址",
                     onclick=self.query_location,
@@ -49,7 +50,7 @@ class Address:
     @use_scope("output", clear=True)
     def query_address(self):
         try:
-            addresses = list(set([s.strip() for s in pin["address"].strip().split("\n")]))
+            addresses = list(set([s.strip() for s in str(pin["address"]).strip().split("\n")]))
             content = [["地址", "经度", "纬度"]]
             total = len(addresses)
             put_progressbar("bar")
@@ -82,7 +83,7 @@ class Address:
     @use_scope("output", clear=True)
     def query_location(self):
         try:
-            locations = list(set([s.strip() for s in pin["address"].strip().split("\n")]))
+            locations = list(set([s.strip() for s in str(pin["address"]).strip().split("\n")]))
             content = [["经度", "纬度", "地址"]]
             total = len(locations)
             put_progressbar("bar")

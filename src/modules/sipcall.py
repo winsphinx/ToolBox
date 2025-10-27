@@ -132,25 +132,25 @@ class Sipcall:
             put_text("开始生成脚本...")
             mode = pin["mode"]
             isbc_number = pin["isbc_number"]
-            name = pin["name"].strip()
-            ip = pin["IP"].strip()
-            pool = pin["pool"].strip()
-            nexthop = pin["nexthop"].strip()
-            ra1, ra2 = pin["routes"].strip().split("/")
-            cac = pin["cac"].strip()
-            max = int(pin["max"].strip())
-            mgcf = pin["mgcf"].strip()
-            isbc = pin["isbc"].strip()
-            adj = pin["adj"].strip()
-            node = pin["node"].strip()
-            br1, br2 = pin["brs"].strip().split("/")
-            link = pin["link"].strip()
-            tg = pin["tg"].strip()
-            rt = pin["tg"].strip()
-            rts = pin["tg"].strip()
-            chain = pin["tg"].strip()
-            auth = pin["auth"].strip()
-            sub_numbers = [s.strip() for s in pin["sub_numbers"].strip().split("\n")]
+            name = str(pin["name"]).strip()
+            ip = str(pin["IP"]).strip()
+            pool = str(pin["pool"]).strip()
+            nexthop = str(pin["nexthop"]).strip()
+            ra1, ra2 = str(pin["routes"]).strip().split("/")
+            cac = str(pin["cac"]).strip()
+            max = int(str(pin["max"]).strip())
+            mgcf = str(pin["mgcf"]).strip()
+            isbc = str(pin["isbc"]).strip()
+            adj = str(pin["adj"]).strip()
+            node = str(pin["node"]).strip()
+            br1, br2 = str(pin["brs"]).strip().split("/")
+            link = str(pin["link"]).strip()
+            tg = str(pin["tg"]).strip()
+            rt = str(pin["tg"]).strip()
+            rts = str(pin["tg"]).strip()
+            chain = str(pin["tg"]).strip()
+            auth = str(pin["auth"]).strip()
+            sub_numbers = [s.strip() for s in str(pin["sub_numbers"]).strip().split("\n")]
 
             content = "*" * 20 + "\n\t摘要\n" + "*" * 20 + "\n"
             content += f"名称：{name}\n"
@@ -277,7 +277,7 @@ class Sipcall:
             METHOD = '"INVITE"&"PRACK"&"ACK"&"UPDATE"&"CANCEL"&"BYE"&"OPTIONS"&"INFO"&"REGISTER"&"SUBSCRIBE"&"REFER"&"NOTIFY"&"MESSAGE"&"PUBLISH"'
             content += f'ADD URI:RTSEL=1,URI="ibac{adj}.zj.ims.chinaunicom.cn",METHOD={METHOD},SIPRTS={adj};\n'
             content += "//中继组配置\n"
-            TPDAS = {"对等方式": 52, "签约方式": 250}.get(mode, None)
+            TPDAS = {"对等方式": 52, "签约方式": 250}.get(str(mode), None)
             content += f'ADD TG RTP:TG={tg},OFC={adj},MODULE=0,LINE="SIP",NAME="{name}-绍兴",KIND="BIDIR",TPDAS={TPDAS},ROAMDAS=0,SIPROUTESET={adj};\n'
             content += f'SET TG:TG={tg},IOI="zj.ims.chinaunicom.cn";\n'
             content += "//设置对等中继标签\n"
@@ -297,7 +297,7 @@ class Sipcall:
             for i in range(10):
                 content += f'ADD AUTH:DAS={auth},DIGIT="{i}",CALLRITID=999,NAME="{name}-绍兴";\n'
             for n in sub_numbers:
-                CALLRITID = {"对等方式": 19, "签约方式": 200}.get(mode, None)
+                CALLRITID = {"对等方式": 19, "签约方式": 200}.get(str(mode), None)
                 content += f'ADD AUTH:DAS={auth},DIGIT="{n}",CALLRITID={CALLRITID},VALIDLEN={len(n)},NAME="{name}-绍兴";\n'
                 content += f'ADD AUTH:DAS={auth},DIGIT="0086575{n}",CALLRITID={CALLRITID},VALIDLEN={len(n) + 7},NAME="{name}-绍兴";\n'
             content += "//落地数据配置\n"

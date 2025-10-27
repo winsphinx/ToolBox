@@ -36,9 +36,9 @@ class Location:
     @use_scope("output", clear=True)
     def update(self):
         content = [["名称", "地址", "区县", "城市"]]
-        keyword = pin["keyword"].strip()
-        location = pin["location"].strip()
-        radius = pin["radius"].strip()
+        keyword = str(pin["keyword"]).strip()
+        location = str(pin["location"]).strip()
+        radius = str(pin["radius"]).strip()
 
         KEY = "3252a68ab8715c2d869ffc388d9ce580"
         url = f"https://restapi.amap.com/v3/place/around?key={KEY}&location={location}&keywords={keyword}&radius={radius}&output=json"

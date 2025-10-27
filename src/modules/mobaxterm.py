@@ -93,11 +93,11 @@ class Mobaxterm:
     @use_scope("output", clear=True)
     def update(self):
         license_type = pin["selector"]
-        username = pin["username"].strip()
-        version = pin["version"].strip().split(".")
+        username = str(pin["username"]).strip()
+        version = str(pin["version"]).strip().split(".")
         major_version = int(version[0])
         minor_version = int(version[1])
-        count = int(pin["count"].strip())
+        count = int(str(pin["count"]).strip())
 
         license_string = f"{license_type}#{username}|{major_version}{minor_version}#{count}#{major_version}3{minor_version}6{minor_version}#0#0#0#"
         encoded_license_string = base64_encode(encrypt_bytes(0x787, license_string.encode())).decode()

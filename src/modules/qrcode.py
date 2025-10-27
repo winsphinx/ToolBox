@@ -26,7 +26,7 @@ def put_picture(png_data_list):
     for f in range(0, len(png_data_list), 45):
         image = Image.new("RGB", (w, h), "white")
 
-        chunk = png_data_list[f:f + 45]
+        chunk = png_data_list[f : f + 45]
         for i in range(len(chunk)):
             # 左上角坐标 (x, y)
             col = i % 5

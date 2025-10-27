@@ -49,10 +49,10 @@ class Callgroup:
 
     @use_scope("output", clear=True)
     def update(self):
-        code = pin["code"].strip()
-        name = pin["name"].strip()
-        main_number = pin["main_number"].strip()
-        sub_numbers = [s.strip() for s in pin["sub_numbers"].strip().split("\n")]
+        code = str(pin["code"]).strip()
+        name = str(pin["name"]).strip()
+        main_number = str(pin["main_number"]).strip()
+        sub_numbers = [s.strip() for s in str(pin["sub_numbers"]).strip().split("\n")]
 
         if not self.check_5xxxx(code):
             put_text("错误：请输入 5 开头的 5 位编号！")

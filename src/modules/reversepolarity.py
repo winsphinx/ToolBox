@@ -26,7 +26,7 @@ class Reversepolarity:
     @use_scope("output", clear=True)
     def update(self):
         try:
-            numbers = [s.strip() for s in pin["numbers"].strip().split("\n")]
+            numbers = [s.strip() for s in str(pin["numbers"]).strip().split("\n")]
             data = [(x.split()[5], x.split()[2]) for x in numbers]
 
             content = "## PON\n```"
