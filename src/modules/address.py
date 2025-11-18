@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import json
+import time
 
 import requests
 from pywebio.output import put_button, put_markdown, put_progressbar, put_row, put_scope, put_table, put_text, set_progressbar, use_scope
@@ -58,6 +59,7 @@ class Address:
             for address in addresses:
                 set_progressbar("bar", (addresses.index(address) + 1) / total)
                 try:
+                    time.sleep(1)
                     location = self.get_loc(address).split(",")
                     content += [[address, location[0], location[1]]]
                 except KeyError:
@@ -92,7 +94,7 @@ class Address:
                 set_progressbar("bar", (locations.index(location) + 1) / total)
                 try:
                     lat, lon = location.split(",")
-
+                    time.sleep(1)
                     try:
                         address = self.get_addr(location)
                         content += [[lat, lon, address]]

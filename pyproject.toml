@@ -13,5 +13,5 @@ dependencies = [
 ]
 
 [tool.ruff]
-line-length = 1080
+line-length = 320
 lint.extend-select = ["I"]
