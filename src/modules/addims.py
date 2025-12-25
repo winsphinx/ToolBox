@@ -8,6 +8,8 @@ from pywebio.output import put_button, put_file, put_html, put_markdown, put_sco
 from pywebio.pin import pin, put_input, put_radio, put_textarea
 from pywebio.session import run_js
 
+from utils import display_random_image
+
 
 def add_copy_button_to_code_blocks():
     # 添加 CSS 样式，用于定位和美化复制按钮
@@ -106,6 +108,8 @@ pre {
 
 class AddIMS:
     def __init__(self):
+        display_random_image()
+
         put_markdown("# 手工IMS加号码脚本生成器")
         put_radio(
             "area",

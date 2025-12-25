@@ -6,9 +6,13 @@ import time
 from pywebio.output import put_button, put_file, put_markdown, put_scope, put_text, use_scope
 from pywebio.pin import pin, put_textarea
 
+from utils import display_random_image
+
 
 class Reversepolarity:
     def __init__(self):
+        display_random_image()
+
         put_markdown("# 反极性脚本生成器")
         put_textarea(
             "numbers",

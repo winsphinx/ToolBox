@@ -7,6 +7,8 @@ import pandas as pd
 from pywebio.output import put_button, put_file, put_loading, put_markdown, put_scope, put_text, use_scope
 from pywebio.pin import pin, put_file_upload
 
+from utils import display_random_image
+
 dic1 = {
     "浙江": "浙江省",
     "北京": "北京市",
@@ -59,6 +61,8 @@ dic2 = {
 
 class Roamusers:
     def __init__(self):
+        display_random_image()
+
         self.networks = None
         self.host = None
 

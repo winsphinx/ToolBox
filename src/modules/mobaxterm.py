@@ -8,6 +8,8 @@ from io import BytesIO
 from pywebio.output import put_button, put_file, put_markdown, put_row, put_scope, use_scope
 from pywebio.pin import pin, put_input, put_select
 
+from utils import display_random_image
+
 base64_table = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/="
 base64_dict = {i: base64_table[i] for i in range(len(base64_table))}
 
@@ -51,6 +53,8 @@ def encrypt_bytes(key: int, bs: bytes):
 
 class Mobaxterm:
     def __init__(self):
+        display_random_image()
+
         put_markdown("# MobaXterm 注册工具")
         put_row(
             [

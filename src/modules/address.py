@@ -8,12 +8,16 @@ import requests
 from pywebio.output import put_button, put_markdown, put_progressbar, put_row, put_scope, put_table, put_text, set_progressbar, use_scope
 from pywebio.pin import pin, put_textarea
 
+from utils import display_random_image
+
 KEY = "3252a68ab8715c2d869ffc388d9ce580"
 OUTPUT = "json"
 
 
 class Address:
     def __init__(self):
+        display_random_image()
+
         put_markdown("# 地址-经纬度 查询工具")
         put_textarea(
             "address",

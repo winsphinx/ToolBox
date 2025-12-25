@@ -9,6 +9,8 @@ import pandas as pd
 from pywebio.input import file_upload
 from pywebio.output import put_datatable, put_file, put_loading, put_markdown
 
+from utils import display_random_image
+
 
 def read_file(file):
     return pd.read_excel(BytesIO(file["content"]), sheet_name=None)
@@ -118,6 +120,8 @@ def deal_data(data):
 
 class Sites:
     def __init__(self):
+        display_random_image()
+
         put_markdown("# 基站稽核")
 
         file = file_upload(

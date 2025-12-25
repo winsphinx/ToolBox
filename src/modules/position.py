@@ -5,9 +5,13 @@ import requests
 from pywebio.output import put_button, put_loading, put_markdown, put_scope, put_text, use_scope
 from pywebio.pin import pin, put_textarea
 
+from utils import display_random_image
+
 
 class Position:
     def __init__(self):
+        display_random_image()
+
         put_markdown("# IP 地址-地理位置 查询工具")
         put_textarea(
             "ip",
