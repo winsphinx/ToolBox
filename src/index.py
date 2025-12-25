@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import base64
+import glob
 import os
 from functools import partial
 from random import choice
@@ -50,23 +51,27 @@ def create_app_index():
     for tool in TOOLS_CONFIG:
         put_button(tool["name"], onclick=partial(go_app, tool["app"]), color=choice(COLORS))
 
-    image = os.path.join(os.path.dirname(__file__), "pet.gif")
-    with open(image, "rb") as f:
-        base64_img = base64.b64encode(f.read()).decode("utf-8")
-        put_html(f"""
-        <img src="data:image/gif;base64,{base64_img}"
-            style="
-                position: fixed;
-                bottom: 250px;
-                right: 25px;
-                z-index: 100;
-                width: 250px;
-                pointer-events: none;
-                background: transparent;
-                border: none;
-                box-shadow: none;
-            ">
-        """)
+    pets_dir = os.path.join(os.path.dirname(__file__), "resources")
+    pet_images = glob.glob(os.path.join(pets_dir, "*"))
+
+    if pet_images:
+        selected_image = choice(pet_images)
+        with open(selected_image, "rb") as f:
+            base64_image = base64.b64encode(f.read()).decode("utf-8")
+            put_html(f"""
+            <img src="data:image/gif;base64,{base64_image}"
+                style="
+                    position: fixed;
+                    bottom: 250px;
+                    right: 25px;
+                    z-index: 100;
+                    width: 250px;
+                    pointer-events: none;
+                    background: transparent;
+                    border: none;
+                    box-shadow: none;
+                ">
+            """)
 
 
 if __name__ == "__main__":
