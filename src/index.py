@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+import base64
+import os
 from functools import partial
 from random import choice
 
 from pywebio import config, start_server
-from pywebio.output import put_button, put_markdown
+from pywebio.output import put_button, put_html, put_markdown
 from pywebio.session import go_app
 
 from modules.addims import AddIMS
@@ -48,6 +49,24 @@ def create_app_index():
     put_markdown("# 七零八落工具箱")
     for tool in TOOLS_CONFIG:
         put_button(tool["name"], onclick=partial(go_app, tool["app"]), color=choice(COLORS))
+
+    image = os.path.join(os.path.dirname(__file__), "pet.gif")
+    with open(image, "rb") as f:
+        base64_img = base64.b64encode(f.read()).decode("utf-8")
+        put_html(f"""
+        <img src="data:image/gif;base64,{base64_img}"
+            style="
+                position: fixed;
+                bottom: 250px;
+                right: 25px;
+                z-index: 100;
+                width: 250px;
+                pointer-events: none;
+                background: transparent;
+                border: none;
+                box-shadow: none;
+            ">
+        """)
 
 
 if __name__ == "__main__":
