@@ -7,12 +7,12 @@ from random import choice
 from pywebio.output import put_button, put_file, put_loading, put_markdown, put_scope, put_text, use_scope
 from pywebio.pin import pin, put_input, put_radio, put_textarea
 
-from utils import display_random_image
+from utils import display_random_pet
 
 
 class Sipcall:
     def __init__(self):
-        display_random_image()
+        display_random_pet()
 
         put_markdown("# SIP 数字中继脚本生成器")
         put_radio(

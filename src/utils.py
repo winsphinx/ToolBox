@@ -106,16 +106,16 @@ def add_copy_button_to_code_blocks():
     )
 
 
-def display_random_image():
+def display_random_pet():
     """
     在页面右下方显示一个随机图片
     """
     pets_dir = os.path.join(os.path.dirname(__file__), "resources")
-    pet_images = glob.glob(os.path.join(pets_dir, "*"))
+    pets = glob.glob(os.path.join(pets_dir, "*"))
 
-    if pet_images:
-        selected_image = choice(pet_images)
-        with open(selected_image, "rb") as f:
+    if pets:
+        selected_pet = choice(pets)
+        with open(selected_pet, "rb") as f:
             base64_image = base64.b64encode(f.read()).decode("utf-8")
             put_html(
                 f"""

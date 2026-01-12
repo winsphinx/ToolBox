@@ -9,7 +9,7 @@ from PIL import Image
 from pywebio.output import put_button, put_file, put_loading, put_markdown, put_scope, use_scope
 from pywebio.pin import pin, put_file_upload
 
-from utils import display_random_image
+from utils import display_random_pet
 
 
 def put_picture(png_data_list):
@@ -51,7 +51,7 @@ def put_picture(png_data_list):
 
 class QRCode:
     def __init__(self):
-        display_random_image()
+        display_random_pet()
 
         put_markdown("# 码化之二维码生成工具")
 

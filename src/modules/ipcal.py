@@ -7,12 +7,12 @@ import math
 from pywebio.output import put_button, put_markdown, put_scope, put_text, use_scope
 from pywebio.pin import pin, put_input
 
-from utils import display_random_image
+from utils import display_random_pet
 
 
 class IPcal:
     def __init__(self):
-        display_random_image()
+        display_random_pet()
 
         put_markdown("# IP 地址计算器")
         put_input(

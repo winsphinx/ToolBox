@@ -7,12 +7,12 @@ import time
 from pywebio.output import put_button, put_file, put_markdown, put_scope, use_scope
 from pywebio.pin import pin, put_input, put_radio, put_textarea
 
-from utils import add_copy_button_to_code_blocks, display_random_image
+from utils import add_copy_button_to_code_blocks, display_random_pet
 
 
 class AddIMS:
     def __init__(self):
-        display_random_image()
+        display_random_pet()
 
         put_markdown("# 手工IMS加号码脚本生成器")
         put_radio(

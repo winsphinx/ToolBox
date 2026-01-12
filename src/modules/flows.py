@@ -9,7 +9,7 @@ from pywebio.input import checkbox, radio
 from pywebio.output import put_button, put_file, put_html, put_loading, put_markdown, put_scope, use_scope
 from pywebio.pin import pin, put_file_upload
 
-from utils import display_random_image
+from utils import display_random_pet
 
 
 def calculate_network(df):
@@ -22,7 +22,7 @@ def calculate_network(df):
 
 class Flows:
     def __init__(self):
-        display_random_image()
+        display_random_pet()
 
         self.networks = None
         self.host = None

@@ -6,12 +6,12 @@ import re
 from pywebio.output import put_button, put_file, put_markdown, put_scope, put_text, use_scope
 from pywebio.pin import pin, put_input, put_textarea
 
-from utils import display_random_image
+from utils import display_random_pet
 
 
 class Callgroup:
     def __init__(self):
-        display_random_image()
+        display_random_pet()
 
         put_markdown("# 轮选组脚本生成器")
         put_input(

@@ -22,7 +22,7 @@ from modules.reversepolarity import Reversepolarity
 from modules.roamusers import Roamusers
 from modules.sipcall import Sipcall
 from modules.sites import Sites
-from utils import display_random_image
+from utils import display_random_pet
 
 COLORS = ["primary", "secondary", "success", "danger", "warning", "info", "dark"]
 
@@ -46,7 +46,7 @@ TOOLS_CONFIG = [
 
 
 def create_app_index():
-    display_random_image()
+    display_random_pet()
 
     put_markdown("# 七零八落工具箱")
     for tool in TOOLS_CONFIG:

@@ -5,12 +5,12 @@ import requests
 from pywebio.output import put_button, put_markdown, put_scope, put_table, use_scope
 from pywebio.pin import pin, put_input
 
-from utils import display_random_image
+from utils import display_random_pet
 
 
 class Location:
     def __init__(self):
-        display_random_image()
+        display_random_pet()
 
         put_markdown("# 地理位置范围查询工具")
         put_input(
