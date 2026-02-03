@@ -12,6 +12,7 @@ from modules.addims import AddIMS
 from modules.address import Address
 from modules.callgroup import Callgroup
 from modules.flows import Flows
+from modules.hw2zte import Hw2Zx
 from modules.ipcal import IPcal
 from modules.location import Location
 from modules.mobaxterm import Mobaxterm
@@ -42,6 +43,7 @@ TOOLS_CONFIG = [
     {"name": "地理位置范围查询工具", "app": "location", "cls": Location},
     {"name": "漫游用户统计工具", "app": "roamusers", "cls": Roamusers},
     {"name": "MobaXterm 注册工具", "app": "mobaxterm", "cls": Mobaxterm},
+    {"name": "HW 转 ZX 专线脚本生成器", "app": "hw2zte", "cls": Hw2Zx},
 ]
 
 
