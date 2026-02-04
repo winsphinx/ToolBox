@@ -12,7 +12,7 @@ class Ngn2IMS:
     def __init__(self):
         display_random_pet()
 
-        put_markdown("# NGN->IMS 脚本生成器")
+        put_markdown("# NGN 迁转 IMS 脚本生成器")
         put_radio(
             "area",
             label="区县",

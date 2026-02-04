@@ -38,7 +38,7 @@ TOOLS_CONFIG = [
     {"name": "基站稽核工具", "app": "sites", "cls": Sites},
     {"name": "省际流量分析工具", "app": "flows", "cls": Flows},
     {"name": "IMS 手工加号码脚本生成器", "app": "addims", "cls": AddIMS},
-    {"name": "NGN 签转 IMS 脚本生成器", "app": "ngn2ims", "cls": Ngn2IMS},
+    {"name": "NGN 迁转 IMS 脚本生成器", "app": "ngn2ims", "cls": Ngn2IMS},
     {"name": "码化之二维码生成工具", "app": "qrcode", "cls": QRCode},
     {"name": "地理位置范围查询工具", "app": "location", "cls": Location},
     {"name": "漫游用户统计工具", "app": "roamusers", "cls": Roamusers},
