@@ -32,7 +32,7 @@ class Hw2Zx:
     def update(self):
         content = ""
         params = []
-        code = pin["code"]
+        code = "\n" + pin["code"]
         segments = re.findall(r"(\ninterface Eth-Trunk.*?\n#)", code, re.DOTALL)
         for segment in segments:
             desc_match = re.search(r"description (.+)", segment)
@@ -78,7 +78,7 @@ class Hw2Zx:
                 content += f"""\n\ninterface smartgroup1.{item["vid"]}
  description {item["description"]}
   ip address {item["ipv4"]} {item["mask"]}
-  qinq internal-vlanid {item["qinq_pv"]} external-vlanid {item["qinq_cv"]}
+  qinq internal-vlanid {item["qinq_cv"]} external-vlanid {item["qinq_pv"]}
   ipv4-access-group egress {item["policy"]}
   ipv4 verify unicast source reachable-via any ignore-default-route
 """
