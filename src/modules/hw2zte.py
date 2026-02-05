@@ -72,7 +72,10 @@ class Hw2Zx:
   ipv6 address {item["ipv6"]}
   ipv6-access-group egress {item["policy"]}
   ipv6 verify unicast source reachable-via any ignore-default-route
+!
 """
+                else:
+                    content += "!"
 
             elif item["qinq_cv"]:
                 content += f"""\n\ninterface smartgroup1.{item["vid"]}
@@ -87,7 +90,10 @@ class Hw2Zx:
   ipv6 address {item["ipv6"]}
   ipv6-access-group egress {item["policy"]}
   ipv6 verify unicast source reachable-via any ignore-default-route
+!
 """
+                else:
+                    content += "!"
 
         put_markdown(content)
 
