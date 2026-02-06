@@ -12,7 +12,7 @@ from modules.addims import AddIMS
 from modules.address import Address
 from modules.callgroup import Callgroup
 from modules.flows import Flows
-from modules.hw2zte import Hw2Zx
+from modules.hw2zx import Hw2Zx
 from modules.ipcal import IPcal
 from modules.location import Location
 from modules.mobaxterm import Mobaxterm
