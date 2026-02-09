@@ -23,6 +23,7 @@ from modules.reversepolarity import Reversepolarity
 from modules.roamusers import Roamusers
 from modules.sipcall import Sipcall
 from modules.sites import Sites
+from modules.zx2hw import Zx2Hw
 from utils import display_random_pet
 
 COLORS = ["primary", "secondary", "success", "danger", "warning", "info", "dark"]
@@ -43,7 +44,8 @@ TOOLS_CONFIG = [
     {"name": "地理位置范围查询工具", "app": "location", "cls": Location},
     {"name": "漫游用户统计工具", "app": "roamusers", "cls": Roamusers},
     {"name": "MobaXterm 注册工具", "app": "mobaxterm", "cls": Mobaxterm},
-    {"name": "HW 转 ZX 专线脚本生成器", "app": "hw2zte", "cls": Hw2Zx},
+    {"name": "HW 转 ZX 专线脚本生成器", "app": "hw2zx", "cls": Hw2Zx},
+    {"name": "ZX 转 HW 专线脚本生成器", "app": "zx2hw2", "cls": Zx2Hw},
 ]
 
 
