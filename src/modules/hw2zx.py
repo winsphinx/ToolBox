@@ -44,14 +44,14 @@ class Hw2Zx:
             dot1q_match = re.search(r"dot1q termination vid (\d+)", segment)
             qinq_match = re.search(r"qinq termination pe-vid (\d+) ce-vid (\d+)", segment)
 
-            if ipv4_match:
+            if vid_match:
                 param = {
                     "vid": vid_match.group(1),
-                    "description": desc_match.group(1).strip() if desc_match else "no description",
-                    "ipv4": ipv4_match.group(1),
-                    "mask": ipv4_match.group(2),
-                    "ipv6": ipv6_match.group(1) if ipv6_match else None,
+                    "description": desc_match.group(1).strip() if desc_match else "No Description",
                     "policy": policy_match.group(1) if policy_match else "NoWebNoDNS",
+                    "ipv4": ipv4_match.group(1) if ipv4_match else None,
+                    "mask": ipv4_match.group(2) if ipv4_match else None,
+                    "ipv6": ipv6_match.group(1) if ipv6_match else None,
                     "dot1q": dot1q_match.group(1) if dot1q_match else None,
                     "qinq_pv": qinq_match.group(1) if qinq_match else None,
                     "qinq_cv": qinq_match.group(2) if qinq_match else None,
