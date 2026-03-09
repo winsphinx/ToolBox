@@ -44,16 +44,24 @@ class Hw2Zx:
         else:
             return
 
-        segments = re.findall(r"(\ninterface Eth-Trunk.*?\n#)", code, re.DOTALL)
+        code = code.replace("\r\n", "\n").replace("\xa0", " ")
+        segments = re.findall(r"(interface Eth-Trunk.*?(?=interface Eth-Trunk|$))", code, re.DOTALL)
+
         for segment in segments:
+            vid_match = re.search(r"interface Eth-Trunk\d+\.(\d+)", segment)
             desc_match = re.search(r"description (.+)", segment)
-            vid_match = re.search(r"interface Eth-Trunk([\d.]+)", segment)
+
             ipv4_match = re.search(r"ip address (\d+\.\d+\.\d+\.\d+) (\d+\.\d+\.\d+\.\d+)", segment)
             ipv6_match = re.search(r"ipv6 address ([\da-fA-F:]+/\d+)", segment)
             policy_match = re.search(r"traffic-policy\s+(\S+)\s+outbound", segment)
 
             dot1q_match = re.search(r"dot1q termination vid (\d+)", segment)
             qinq_match = re.search(r"qinq termination pe-vid (\d+) ce-vid (\d+)", segment)
+
+            bas_match = re.search(r"bas\s+access-type layer2-subscriber", segment)
+            ipoe_match = re.search(r"user-vlan (\d+) qinq (\d+)", segment)
+            qos_match = re.search(r"qos-profile (\S+) (?:inbound|outbound)", segment)
+            user_match = re.search(r"static-user (\S+) (\d+\.\d+\.\d+\.\d+) .* domain-name (\S+)", segment)
 
             if vid_match:
                 param = {
@@ -66,6 +74,13 @@ class Hw2Zx:
                     "dot1q": dot1q_match.group(1) if dot1q_match else None,
                     "qinq_pv": qinq_match.group(1) if qinq_match else None,
                     "qinq_cv": qinq_match.group(2) if qinq_match else None,
+                    "ipoe_iv": ipoe_match.group(1) if ipoe_match else None,
+                    "ipoe_ev": ipoe_match.group(2) if ipoe_match else None,
+                    "bas": True if bas_match else False,
+                    "qos": qos_match.group(1) if qos_match else None,
+                    "user_id": user_match.group(1) if user_match else None,
+                    "user_ip": user_match.group(2) if user_match else None,
+                    "domain": user_match.group(3) if user_match else None,
                 }
                 params.append(param)
 
@@ -105,6 +120,23 @@ class Hw2Zx:
 """
                 else:
                     content += "!"
+
+            elif item["bas"]:
+                domain = item["domain"] or "default"
+                prefix = domain.split("_")[0].upper() if "_" in domain else domain.upper()
+                content += f"""\n\ninterface smartgroup1.{item["vid"]}
+  description {item["description"]}
+  qinq internal-vlanid {item["ipoe_iv"]} external-vlanid {item["ipoe_ev"]}
+!
+vcc-configuration
+  interface smartgroup1.{item["vid"]}
+    encapsulation multi
+!
+vbui-configuration
+  interface vbui1000
+    ip-host description {item["user_id"]} {item["user_ip"]} smartgroup1.{item["vid"]} vlan {item["ipoe_ev"]} sec-vlan {item["ipoe_iv"]} author-temp-name {item["qos"]} user-info {domain} {domain} {prefix} group-user export
+!
+"""
 
         put_markdown(content)
 
