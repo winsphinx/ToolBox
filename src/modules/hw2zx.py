@@ -5,7 +5,7 @@ import re
 import time
 
 from pywebio.output import put_button, put_file, put_markdown, put_scope, use_scope
-from pywebio.pin import pin, put_textarea
+from pywebio.pin import pin, put_file_upload, put_textarea
 
 from utils import display_random_pet
 
@@ -16,10 +16,15 @@ class Hw2Zx:
 
         put_markdown("# HW 转 ZX 专线脚本生成器")
         put_textarea(
-            "code",
-            label="HW 脚本",
+            name="code",
+            label="在下面文本框中粘贴 HW 脚本内容，以 # 作为分割。",
             placeholder="interface Eth-Trunk...\n.....\n.....\n.....\n#",
-            help_text="在这里粘贴 HW 脚本内容，以 # 作为分割。",
+        )
+        put_file_upload(
+            name="code_file",
+            label="或者，直接上传 HW 脚本",
+            accept=".txt",
+            placeholder="上传 HW 配置文件",
         )
         put_button(
             label="点击生成 ZX 脚本",
@@ -32,7 +37,13 @@ class Hw2Zx:
     def update(self):
         content = ""
         params = []
-        code = "\n" + pin["code"]
+        if pin["code"]:
+            code = "\n" + pin["code"]
+        elif pin["code_file"]:
+            code = pin["code_file"]["content"].decode(encoding="utf-8")
+        else:
+            return
+
         segments = re.findall(r"(\ninterface Eth-Trunk.*?\n#)", code, re.DOTALL)
         for segment in segments:
             desc_match = re.search(r"description (.+)", segment)
