@@ -10,6 +10,15 @@ from pywebio.pin import pin, put_file_upload, put_textarea
 from utils import display_random_pet
 
 
+def smart_decode(content):
+    for charset in ["utf-16", "gbk", "utf-8", "utf-8-sig"]:
+        try:
+            return content.decode(charset)
+        except UnicodeDecodeError:
+            continue
+    return content
+
+
 class Hw2Zx:
     def __init__(self):
         display_random_pet()
@@ -40,7 +49,7 @@ class Hw2Zx:
         if pin["code"]:
             code = "\n" + pin["code"]
         elif pin["code_file"]:
-            code = pin["code_file"]["content"].decode(encoding="utf-8")
+            code = smart_decode(pin["code_file"]["content"])
         else:
             return
 
@@ -68,19 +77,19 @@ class Hw2Zx:
                     "vid": vid_match.group(1),
                     "description": desc_match.group(1).strip() if desc_match else "No Description",
                     "policy": policy_match.group(1) if policy_match else "NoWebNoDNS",
-                    "ipv4": ipv4_match.group(1) if ipv4_match else None,
-                    "mask": ipv4_match.group(2) if ipv4_match else None,
-                    "ipv6": ipv6_match.group(1) if ipv6_match else None,
-                    "dot1q": dot1q_match.group(1) if dot1q_match else None,
-                    "qinq_pv": qinq_match.group(1) if qinq_match else None,
-                    "qinq_cv": qinq_match.group(2) if qinq_match else None,
-                    "ipoe_iv": ipoe_match.group(1) if ipoe_match else None,
-                    "ipoe_ev": ipoe_match.group(2) if ipoe_match else None,
-                    "bas": True if bas_match else False,
-                    "qos": qos_match.group(1) if qos_match else None,
-                    "user_id": user_match.group(1) if user_match else None,
-                    "user_ip": user_match.group(2) if user_match else None,
-                    "domain": user_match.group(3) if user_match else None,
+                    "ipv4": ipv4_match.group(1) if ipv4_match else False,
+                    "mask": ipv4_match.group(2) if ipv4_match else False,
+                    "ipv6": ipv6_match.group(1) if ipv6_match else False,
+                    "dot1q": dot1q_match.group(1) if dot1q_match else False,
+                    "qinq_pv": qinq_match.group(1) if qinq_match else False,
+                    "qinq_cv": qinq_match.group(2) if qinq_match else False,
+                    "ipoe_mode": True if bas_match else False,
+                    "ipoe_iv": ipoe_match.group(1) if ipoe_match else False,
+                    "ipoe_ev": ipoe_match.group(2) if ipoe_match else False,
+                    "qos": qos_match.group(1) if qos_match else False,
+                    "user_id": user_match.group(1) if user_match else False,
+                    "user_ip": user_match.group(2) if user_match else False,
+                    "domain": user_match.group(3) if user_match else False,
                 }
                 params.append(param)
 
@@ -121,7 +130,7 @@ class Hw2Zx:
                 else:
                     content += "!"
 
-            elif item["bas"]:
+            elif item["ipoe_mode"]:
                 domain = item["domain"] or "default"
                 prefix = domain.split("_")[0].upper() if "_" in domain else domain.upper()
                 content += f"""\n\ninterface smartgroup1.{item["vid"]}
