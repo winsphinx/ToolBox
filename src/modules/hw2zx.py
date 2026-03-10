@@ -54,6 +54,9 @@ class Hw2Zx:
             return
 
         code = code.replace("\r\n", "\n").replace("\xa0", " ")
+
+        static_users = re.findall(r"static-user\s+(\S+)\s+(\d+\.\d+\.\d+\.\d+)\s+(\d+\.\d+\.\d+\.\d+).*?Eth-Trunk\d+\.(\d+)\s+vlan\s+(\d+)\s+qinq\s+(\d+)\s+", code)
+
         segments = re.findall(r"(interface Eth-Trunk.*?(?=interface Eth-Trunk|$))", code, re.DOTALL)
 
         for segment in segments:
@@ -67,10 +70,9 @@ class Hw2Zx:
             dot1q_match = re.search(r"dot1q termination vid (\d+)", segment)
             qinq_match = re.search(r"qinq termination pe-vid (\d+) ce-vid (\d+)", segment)
 
-            bas_match = re.search(r"bas\s+access-type layer2-subscriber", segment)
+            bas_match = re.search(r"bas\n", segment)
             ipoe_match = re.search(r"user-vlan (\d+) qinq (\d+)", segment)
             qos_match = re.search(r"qos-profile (\S+) (?:inbound|outbound)", segment)
-            user_match = re.search(r"static-user (\S+) (\d+\.\d+\.\d+\.\d+) .* domain-name (\S+)", segment)
 
             if vid_match:
                 param = {
@@ -87,9 +89,6 @@ class Hw2Zx:
                     "ipoe_iv": ipoe_match.group(1) if ipoe_match else False,
                     "ipoe_ev": ipoe_match.group(2) if ipoe_match else False,
                     "qos": qos_match.group(1) if qos_match else False,
-                    "user_id": user_match.group(1) if user_match else False,
-                    "user_ip": user_match.group(2) if user_match else False,
-                    "domain": user_match.group(3) if user_match else False,
                 }
                 params.append(param)
 
@@ -131,8 +130,6 @@ class Hw2Zx:
                     content += "!"
 
             elif item["ipoe_mode"]:
-                domain = item["domain"] or "default"
-                prefix = domain.split("_")[0].upper() if "_" in domain else domain.upper()
                 content += f"""\n\ninterface smartgroup1.{item["vid"]}
   description {item["description"]}
   qinq internal-vlanid {item["ipoe_iv"]} external-vlanid {item["ipoe_ev"]}
@@ -141,9 +138,12 @@ vcc-configuration
   interface smartgroup1.{item["vid"]}
     encapsulation multi
 !
-vbui-configuration
+"""
+                for static_user in static_users:
+                    if item["vid"] == static_user[3]:
+                        content += f"""vbui-configuration
   interface vbui1000
-    ip-host description {item["user_id"]} {item["user_ip"]} smartgroup1.{item["vid"]} vlan {item["ipoe_ev"]} sec-vlan {item["ipoe_iv"]} author-temp-name {item["qos"]} user-info {domain} {domain} {prefix} group-user export
+    ip-host description {static_user[0]} {static_user[1]} {static_user[2]} smartgroup1.{static_user[3]} vlan {static_user[5]} sec-vlan {static_user[4]} author-temp-name {item["qos"]}  user-info jtznsx_webdeny jtznsx_webdeny JTZNSX group-user  export
 !
 """
 
