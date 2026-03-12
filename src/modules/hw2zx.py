@@ -9,9 +9,52 @@ from pywebio.pin import pin, put_file_upload, put_textarea
 
 from utils import display_random_pet
 
+DOT1Q_TEMPLATE = """
+interface smartgroup1.{vid}
+ description {description}
+  ip address {ipv4} {mask}
+  encapsulation-dot1q {vid}
+  ipv4-access-group egress {policy}
+  ipv4 verify unicast source reachable-via any ignore-default-route
+"""
+
+IPV6_TEMPLATE = """
+  ipv6 enable
+  ipv6 address {ipv6}
+  ipv6-access-group egress {policy}
+  ipv6 verify unicast source reachable-via any ignore-default-route
+!
+"""
+
+QINQ_TEMPLATE = """
+interface smartgroup1.{vid}
+ description {description}
+  ip address {ipv4} {mask}
+  qinq internal-vlanid {qinq_cv} external-vlanid {qinq_pv}
+  ipv4-access-group egress {policy}
+  ipv4 verify unicast source reachable-via any ignore-default-route
+"""
+
+IPOE_TEMPLATE = """
+interface smartgroup1.{vid}
+  description {description}
+  qinq internal-vlanid {ipoe_iv} external-vlanid {ipoe_ev}
+!
+vcc-configuration
+  interface smartgroup1.{vid}
+    encapsulation multi
+!
+"""
+
+USER_TEMPLATE = """vbui-configuration
+  interface vbui1000
+    ip-host description {user} {start_ip} {end_ip} smartgroup1.{vid} vlan {vlan} sec-vlan {sec_vlan} author-temp-name {qos} user-info jtznsx_webdeny jtznsx_webdeny JTZNSX group-user  export
+!
+"""
+
 
 def smart_decode(content):
-    for charset in ["utf-16", "gbk", "utf-8", "utf-8-sig"]:
+    for charset in ["utf-16", "utf-8", "utf-8-sig"]:
         try:
             return content.decode(charset)
         except UnicodeDecodeError:
@@ -94,58 +137,24 @@ class Hw2Zx:
 
         for item in params:
             if item["dot1q"]:
-                content += f"""\n\ninterface smartgroup1.{item["vid"]}
- description {item["description"]}
-  ip address {item["ipv4"]} {item["mask"]}
-  encapsulation-dot1q {item["vid"]}
-  ipv4-access-group egress {item["policy"]}
-  ipv4 verify unicast source reachable-via any ignore-default-route
-"""
+                content += DOT1Q_TEMPLATE.format(**item)
                 if item["ipv6"]:
-                    content += f"""  ipv6 enable
-  ipv6 address {item["ipv6"]}
-  ipv6-access-group egress {item["policy"]}
-  ipv6 verify unicast source reachable-via any ignore-default-route
-!
-"""
+                    content += IPV6_TEMPLATE.format(**item)
                 else:
-                    content += "!"
+                    content += "!\n"
 
             elif item["qinq_cv"]:
-                content += f"""\n\ninterface smartgroup1.{item["vid"]}
- description {item["description"]}
-  ip address {item["ipv4"]} {item["mask"]}
-  qinq internal-vlanid {item["qinq_cv"]} external-vlanid {item["qinq_pv"]}
-  ipv4-access-group egress {item["policy"]}
-  ipv4 verify unicast source reachable-via any ignore-default-route
-"""
+                content += QINQ_TEMPLATE.format(**item)
                 if item["ipv6"]:
-                    content += f"""  ipv6 enable
-  ipv6 address {item["ipv6"]}
-  ipv6-access-group egress {item["policy"]}
-  ipv6 verify unicast source reachable-via any ignore-default-route
-!
-"""
+                    content += IPV6_TEMPLATE.format(**item)
                 else:
-                    content += "!"
+                    content += "!\n"
 
             elif item["ipoe_mode"]:
-                content += f"""\n\ninterface smartgroup1.{item["vid"]}
-  description {item["description"]}
-  qinq internal-vlanid {item["ipoe_iv"]} external-vlanid {item["ipoe_ev"]}
-!
-vcc-configuration
-  interface smartgroup1.{item["vid"]}
-    encapsulation multi
-!
-"""
-                for static_user in static_users:
-                    if item["vid"] == static_user[3]:
-                        content += f"""vbui-configuration
-  interface vbui1000
-    ip-host description {static_user[0]} {static_user[1]} {static_user[2]} smartgroup1.{static_user[3]} vlan {static_user[5]} sec-vlan {static_user[4]} author-temp-name {item["qos"]}  user-info jtznsx_webdeny jtznsx_webdeny JTZNSX group-user  export
-!
-"""
+                content += IPOE_TEMPLATE.format(**item)
+                for user, start_ip, end_ip, vid, sec_vlan, vlan in static_users:
+                    if item["vid"] == vid:
+                        content += USER_TEMPLATE.format(**item, **locals())
 
         put_markdown(content)
 
