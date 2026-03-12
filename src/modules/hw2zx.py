@@ -47,7 +47,7 @@ class Hw2Zx:
         content = ""
         params = []
         if pin["code"]:
-            code = "\n" + pin["code"]
+            code = pin["code"]
         elif pin["code_file"]:
             code = smart_decode(pin["code_file"]["content"])
         else:
