@@ -54,7 +54,7 @@ USER_TEMPLATE = """vbui-configuration
 
 
 def smart_decode(content):
-    for charset in ["utf-16", "utf-8", "utf-8-sig"]:
+    for charset in ["utf-8-sig", "utf-8", "utf-16"]:
         try:
             return content.decode(charset)
         except UnicodeDecodeError:
@@ -152,8 +152,8 @@ class Hw2Zx:
 
             elif item["ipoe_mode"]:
                 content += IPOE_TEMPLATE.format(**item)
-                for user, start_ip, end_ip, vid, sec_vlan, vlan in static_users:
-                    if item["vid"] == vid:
+                for user, start_ip, end_ip, vlanid, sec_vlan, vlan in static_users:
+                    if item["vid"] == vlanid:
                         content += USER_TEMPLATE.format(**item, **locals())
 
         put_markdown(content)

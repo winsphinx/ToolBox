@@ -10,7 +10,7 @@ from utils import display_random_pet
 
 
 def smart_decode(content):
-    for charset in ["utf-16", "utf-8", "utf-8-sig"]:
+    for charset in ["utf-8-sig", "utf-8", "utf-16"]:
         try:
             return content.decode(charset)
         except UnicodeDecodeError:
