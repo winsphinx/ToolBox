@@ -108,47 +108,159 @@ def add_copy_button_to_code_blocks():
 
 def display_random_pet():
     """
-    在页面右下方显示一个随机图片
+    在页面显示一个随机宠物图片，点击出现爆炸粒子特效
     """
     pets_dir = os.path.join(os.path.dirname(__file__), "resources")
     pets = glob.glob(os.path.join(pets_dir, "*"))
 
-    if pets:
-        selected_pet = choice(pets)
-        with open(selected_pet, "rb") as f:
-            base64_image = base64.b64encode(f.read()).decode("utf-8")
-            put_html(
-                f"""
-                <img src="data:image/gif;base64,{base64_image}"
-                    onmouseover="moveImage(this)"
-                    style="
-                        position: fixed;
-                        bottom: 250px;
-                        right: 25px;
-                        z-index: 100;
-                        width: 250px;
-                        transition: all 0.3s ease-in-out; // 让移动更丝滑
-                        cursor: pointer;
-                        background: transparent;
-                    ">
+    if not pets:
+        return
 
-                <script>
-                function moveImage(img) {{
-                    const step = 500;
-                    const padding = 25;
-                    const rect = img.getBoundingClientRect();
+    selected_pet = choice(pets)
+    with open(selected_pet, "rb") as f:
+        base64_image = base64.b64encode(f.read()).decode("utf-8")
 
-                    let newLeft = rect.left + (Math.random() - 0.5) * 2 * step;
-                    let newTop = rect.top + (Math.random() - 0.5) * 2 * step;
+        put_html(f"""
+        <img id="petImage"
+             src="data:image/gif;base64,{base64_image}"
+             onmouseover="moveImage(this)"
+             onclick="explodePet(this)"
+             style="
+                position: fixed;
+                bottom: 250px;
+                right: 25px;
+                z-index: 100;
+                width: 250px;
+                transition: all 0.3s ease-in-out;
+                cursor: pointer;
+                background: transparent;
+             ">
 
-                    newLeft = Math.max(padding, Math.min(window.innerWidth - rect.width - padding, newLeft));
-                    newTop = Math.max(padding, Math.min(window.innerHeight - rect.height - padding, newTop));
+        <canvas id="explosionCanvas"
+                style="position: fixed; top: 0; left: 0; z-index: 101; pointer-events: none; display: none;">
+        </canvas>
 
-                    img.style.bottom = 'auto';
-                    img.style.right = 'auto';
-                    img.style.top = newTop + 'px';
-                    img.style.left = newLeft + 'px';
+        <script>
+        // 移动函数
+        function moveImage(img) {{
+            const step = 500;
+            const padding = 25;
+            const rect = img.getBoundingClientRect();
+
+            let newLeft = rect.left + (Math.random() - 0.5) * 2 * step;
+            let newTop = rect.top + (Math.random() - 0.5) * 2 * step;
+
+            newLeft = Math.max(padding, Math.min(window.innerWidth - rect.width - padding, newLeft));
+            newTop = Math.max(padding, Math.min(window.innerHeight - rect.height - padding, newTop));
+
+            img.style.bottom = 'auto';
+            img.style.right = 'auto';
+            img.style.top = newTop + 'px';
+            img.style.left = newLeft + 'px';
+        }}
+
+        // 粒子爆炸
+        let canvas = document.getElementById('explosionCanvas');
+        let ctx = canvas.getContext('2d');
+        let particles = [];
+        let animationFrame = null;
+
+        class Particle {{
+            constructor(x, y) {{
+                this.x = x;
+                this.y = y;
+                this.size = Math.random() * 8 + 4;            // 粒子大小
+                this.speedX = (Math.random() - 0.5) * 18;     // 横向速度
+                this.speedY = (Math.random() - 0.5) * 18 - 3; // 纵向速度（略向上偏）
+                this.gravity = 0.25;
+                this.life = 55 + Math.random() * 25;          // 存活帧数
+                this.alpha = 1;
+                this.color = 'hsl(' + (Math.random() * 360 | 0) + ', 90%, 65%)';
+            }}
+
+            update() {{
+                this.speedY += this.gravity;
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.life -= 1;
+                this.alpha = this.life / 70;
+                this.size *= 0.98;   // 逐渐缩小
+            }}
+
+            draw() {{
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }}
+        }}
+
+        function createExplosion(x, y, count = 65) {{
+            particles = [];
+            for (let i = 0; i < count; i++) {{
+                particles.push(new Particle(x, y));
+            }}
+        }}
+
+        function animateExplosion() {{
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (let i = particles.length - 1; i >= 0; i--) {{
+                particles[i].update();
+                particles[i].draw();
+
+                if (particles[i].life <= 0 || particles[i].alpha <= 0.05) {{
+                    particles.splice(i, 1);
                 }}
-                </script>
-                """
-            )
+            }}
+
+            if (particles.length > 0) {{
+                animationFrame = requestAnimationFrame(animateExplosion);
+            }} else {{
+                canvas.style.display = 'none';
+            }}
+        }}
+
+        // 点击图片触发爆炸
+        window.explodePet = function(img) {{
+            // 先让图片快速淡出
+            img.style.transition = 'opacity 0.25s ease-out';
+            img.style.opacity = '0';
+
+            // 获取图片在视口中的位置（用于爆炸中心点）
+            const rect = img.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+
+            // 设置 canvas 大小为全屏并显示
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            canvas.style.display = 'block';
+
+            // 创建爆炸
+            createExplosion(centerX, centerY, 65);
+
+            // 开始动画
+            if (animationFrame) cancelAnimationFrame(animationFrame);
+            animateExplosion();
+
+            // 移除旧图片防止重复点击
+            setTimeout(() => {{
+                if (img && img.parentNode) {{
+                    img.remove();
+                }}
+            }}, 300);
+        }};
+
+        // 窗口大小变化时同步
+        window.addEventListener('resize', () => {{
+            if (canvas.style.display === 'block') {{
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }}
+        }});
+        </script>
+        """)
