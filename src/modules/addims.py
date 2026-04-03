@@ -3,11 +3,24 @@
 
 import re
 import time
+from typing import List, Tuple
 
 from pywebio.output import put_button, put_file, put_markdown, put_scope, use_scope
 from pywebio.pin import pin, put_input, put_radio, put_textarea
 
 from utils import add_copy_button_to_code_blocks, display_random_pet
+
+AREA_OPTIONS = [
+    {"label": "越城", "value": "01"},
+    {"label": "上虞", "value": "02"},
+    {"label": "嵊州", "value": "03"},
+    {"label": "新昌", "value": "04"},
+    {"label": "诸暨", "value": "05"},
+    {"label": "柯桥", "value": "06"},
+]
+
+RE_IMS = re.compile(r"^\d{8}$")
+RE_PORT = re.compile(r"^\d+/\d+/\d+$")
 
 
 class AddIMS:
@@ -18,14 +31,7 @@ class AddIMS:
         put_radio(
             "area",
             label="区县",
-            options=[
-                {"label": "越城", "value": "01"},
-                {"label": "上虞", "value": "02"},
-                {"label": "嵊州", "value": "03"},
-                {"label": "新昌", "value": "04"},
-                {"label": "诸暨", "value": "05"},
-                {"label": "柯桥", "value": "06"},
-            ],
+            options=AREA_OPTIONS,
             inline=True,
         )
         put_textarea(
@@ -55,85 +61,122 @@ class AddIMS:
 
     @use_scope("output", clear=True)
     def update(self):
-        def validate_input():
-            telnos = [s.strip() for s in str(pin["telnos"]).strip().split("\n") if s.strip()]
-            passwd = str(pin["passwd"]).strip()
-            ports = [s.strip() for s in str(pin["ports"]).strip().split("\n") if s.strip()]
-            area = pin["area"]
-
-            if not all([telnos, passwd, ports]):
-                raise ValueError("号码、密码和端口为必填项。")
-
-            if any(not re.match(r"^\d{8}$", tel) for tel in telnos):
-                raise ValueError("号码必须为8位纯数字。")
-
-            if any(not re.match(r"^\d+/\d+/\d+$", p) for p in ports):
-                raise ValueError("端口格式应为 0/1/2 结构。")
-
-            if len(ports) != len(telnos):
-                raise ValueError("端口数量与号码数量不一致。")
-
-            return telnos, passwd, ports, area
-
         try:
-            telnos, passwd, ports, area = validate_input()
+            telnos, passwd, ports, area = self._validate_input()
         except ValueError as e:
-            content = f"# 错误\n{str(e)}"
-            put_markdown(content)
+            put_markdown(f"# 错误\n{str(e)}")
         else:
-            str_HSS = "## HSS\n```"
-            for telno in telnos:
-                str_HSS += f"""
-ADD NEWPVI:PVITYPE=0,PVI=+86575{telno}@zj.ims.chinaunicom.cn,IREGFLAG=1,IDENTITYTYPE=0,PECFN=ccf01.zj.ims.chinaunicom.cn,SECFN=ccf02.zj.ims.chinaunicom.cn,PCCFN=ccf01.zj.ims.chinaunicom.cn,SCCFN=ccf02.zj.ims.chinaunicom.cn,SecVer=30,UserName=+86575{telno}@zj.ims.chinaunicom.cn,PassWord={passwd},Realm=zj.ims.chinaunicom.cn,ACCTypeList=*,ACCInfoList=*,ACCValueList=*;
-ADD NEWPUI:IDENTITYTYPE=0,PUI=tel:+86575{telno},BARFLAG=0,REGAUTHFG=1,ROAMSCHEMEID=1,SPID=8,SPDesc=绍兴SP,PVIList=+86575{telno}@zj.ims.chinaunicom.cn,CapsIDList=575,CapsTypeList=0,LOOSEROUTEIND=0;
-ADD NEWPUI:IDENTITYTYPE=0,PUI=sip:+86575{telno}@zj.ims.chinaunicom.cn,BARFLAG=0,REGAUTHFG=1,ROAMSCHEMEID=1,SPID=8,SPDesc=绍兴SP,PVIList=+86575{telno}@zj.ims.chinaunicom.cn,CapsIDList=575,CapsTypeList=0,LOOSEROUTEIND=0;
-MOD PUIINFO:PUI=tel:+86575{telno},LOCALINFO=,LOOSEROUTEIND=0,DISPLAYNAME=*,MAXSESS=0,PHONECONTEXT=,MAXSIMULTREGS=0,SIFCIDList=5030$5600$5910,NATEMPLATEID=0;
-MOD PUIINFO:PUI=sip:+86575{telno}@zj.ims.chinaunicom.cn,LOCALINFO=,LOOSEROUTEIND=0,DISPLAYNAME=*,MAXSESS=0,PHONECONTEXT=,MAXSIMULTREGS=0,SIFCIDList=5030$5600$5910,NATEMPLATEID=0;
-SET IMPREGSET:PUIList=sip:+86575{telno}@zj.ims.chinaunicom.cn$tel:+86575{telno},DefaultPUI=sip:+86575{telno}@zj.ims.chinaunicom.cn;
-SET ALIASEGROUP:PUIList=sip:+86575{telno}@zj.ims.chinaunicom.cn$tel:+86575{telno},AliasGroupID=+86575{telno}@zj.ims.chinaunicom.cn;
-"""
-            str_SLF = "```\n\n## SLF\n```"
-            for telno in telnos:
-                str_SLF += f"""
-ADD SLFUSER:USERIDTYPE=1,USERID=tel:+86575{telno},HSSID=1;
-ADD SLFUSER:USERIDTYPE=1,USERID=sip:+86575{telno}@zj.ims.chinaunicom.cn,HSSID=1;
-"""
-            str_SSS = "```\n\n## SSS\n```"
-            for telno in telnos:
-                str_SSS += f"""
-ADD OSU SBR:PUI="tel:+86575{telno}",NETTYPE=1,CC=86,LATA=575,TYPE="IMS",ONLCHG="OFF",OFFLCHG="ON",NOTOPEN="OFF",OWE="OFF",TSS="TSS_OFF",IRCFS="ON",IRACFSC="OFF",NSOUTG="OFF",NSICO="OFF",CARDUSER="OFF",FORCEOL="OFF",OVLAP="OFF",CFFT="OFF",CORHT="LC"&"DDD"&"SPCS"&"HF"&"LT",CIRHT="LC"&"DDD"&"IDD"&"SPCS"&"HF"&"HKMACAOTW"&"LT",OWECIRHT="LC"&"DDD"&"IDD"&"SPCS"&"HF"&"HKMACAOTW"&"LT",CTXOUTRHT="GRPIN"&"GRPOUT"&"GRPOUTNUM",CTXINRHT="GRPIN"&"GRPOUT"&"GRPOUTNUM",OWECTXOUTRHT="GRPIN"&"GRPOUT"&"GRPOUTNUM",OWECTXINRHT="GRPIN"&"GRPOUT"&"GRPOUTNUM",ACOFAD="575{area}",COMCODE=0,CUSTYPE="B2C",LANGTYPE=0,SPELINE="NO",CALLERAS=0,CALLEDAS=0,CHARGCATEGORY="FREE",CPC=0,PREPAIDTYPE="0",MAXCOMNUM=1,MEDIACAPNO=0,ZONEINDEX=65535,IMSUSERTYPE="NMIMS",OUTGOINGBLACK="NO",NOANSWERTIMER=0,OPSMSININDEX=0;
-SET OSU OIP:PUI="tel:+86575{telno}";
-"""
-            str_EDS = "```\n\n## EDS\n```"
-            for telno in telnos:
-                str_EDS += f"""
-Add NAPTRRec:E164NUM=575{telno},ZONENAME=6.8.e164.arpa,ORDER=10,PREFERENCE=100,FLAGS=U,SERVICE=E2U+SIP,REGEXP=!%5E.*%24!sip:+86575{telno}@zj.ims.chinaunicom.cn!,TTL=3600000;
-"""
-            str_SDC = "```\n\n## SDC\n```"
-            for telno in telnos:
-                str_SDC += f"""
-MOD USR:MODE=BYDN,DN="{telno}",NEWLRN="116448{telno}",INCALLINGPREFIX=IN_1-0, INCALLEDPREFIX=IN_1-0;
-"""
-            str_PON = "```\n\n## PON\n```\nesl user\n"
-            content = str_HSS + str_SLF + str_SSS + str_EDS + str_SDC + str_PON
-
-            for index, telno in enumerate(telnos):
-                content += f"""
-sippstnuser add {ports[index]} 0 telno 86575{telno}
-
-sippstnuser auth set {ports[index]} telno 86575{telno} password-mode password
-+86575{telno}@zj.ims.chinaunicom.cn
-{passwd}
-"""
-            content += "```\n"
-
+            content = self._generate_script(telnos, passwd, ports, area)
             put_markdown(content)
-
-            # 调用函数添加按钮
             add_copy_button_to_code_blocks()
-
-            day = time.strftime("%Y-%m-%d", time.localtime(time.time()))
+            day = time.strftime("%Y-%m-%d")
             put_file(f"{day}.md", content.encode(), ">> 点击下载脚本 <<")
+
+    def _validate_input(self) -> Tuple[List[str], str, List[str], str]:
+        telnos = [s.strip() for s in str(pin["telnos"]).strip().split("\n") if s.strip()]
+        passwd = str(pin["passwd"]).strip()
+        ports = [s.strip() for s in str(pin["ports"]).strip().split("\n") if s.strip()]
+        area = pin["area"]
+
+        if not all([telnos, passwd, ports]):
+            raise ValueError("号码、密码和端口为必填项。")
+
+        if any(not RE_IMS.match(tel) for tel in telnos):
+            raise ValueError("号码必须为8位纯数字。")
+
+        if any(not RE_PORT.match(p) for p in ports):
+            raise ValueError("端口格式应为 0/1/2 结构。")
+
+        if len(ports) != len(telnos):
+            raise ValueError("端口数量与号码数量不一致。")
+
+        return telnos, passwd, ports, area
+
+    def _generate_script(self, telnos: List[str], passwd: str, ports: List[str], area: str) -> str:
+        return "\n".join(
+            [
+                self._gen_hss(telnos, passwd),
+                self._gen_slfs(telnos),
+                self._gen_sss(telnos, area),
+                self._gen_eds(telnos),
+                self._gen_sdc(telnos),
+                self._gen_pon(telnos, passwd, ports),
+            ]
+        )
+
+    def _gen_hss(self, telnos: List[str], passwd: str) -> str:
+        lines = ["## HSS\n```"]
+        for tel in telnos:
+            tel_full = f"+86575{tel}"
+            pvi = f"{tel_full}@zj.ims.chinaunicom.cn"
+            lines.extend(
+                [
+                    f"ADD NEWPVI:PVITYPE=0,PVI={pvi},IREGFLAG=1,IDENTITYTYPE=0,PECFN=ccf01.zj.ims.chinaunicom.cn,SECFN=ccf02.zj.ims.chinaunicom.cn,PCCFN=ccf01.zj.ims.chinaunicom.cn,SCCFN=ccf02.zj.ims.chinaunicom.cn,SecVer=30,UserName={pvi},PassWord={passwd},Realm=zj.ims.chinaunicom.cn,ACCTypeList=*,ACCInfoList=*,ACCValueList=*;",
+                    f"ADD NEWPUI:IDENTITYTYPE=0,PUI=tel:{tel_full},BARFLAG=0,REGAUTHFG=1,ROAMSCHEMEID=1,SPID=8,SPDesc=绍兴SP,PVIList={pvi},CapsIDList=575,CapsTypeList=0,LOOSEROUTEIND=0;",
+                    f"ADD NEWPUI:IDENTITYTYPE=0,PUI=sip:{tel_full}@zj.ims.chinaunicom.cn,BARFLAG=0,REGAUTHFG=1,ROAMSCHEMEID=1,SPID=8,SPDesc=绍兴SP,PVIList={pvi},CapsIDList=575,CapsTypeList=0,LOOSEROUTEIND=0;",
+                    f"MOD PUIINFO:PUI=tel:{tel_full},LOCALINFO=,LOOSEROUTEIND=0,DISPLAYNAME=*,MAXSESS=0,PHONECONTEXT=,MAXSIMULTREGS=0,SIFCIDList=5030$5600$5910,NATEMPLATEID=0;",
+                    f"MOD PUIINFO:PUI=sip:{tel_full}@zj.ims.chinaunicom.cn,LOCALINFO=,LOOSEROUTEIND=0,DISPLAYNAME=*,MAXSESS=0,PHONECONTEXT=,MAXSIMULTREGS=0,SIFCIDList=5030$5600$5910,NATEMPLATEID=0;",
+                    f"SET IMPREGSET:PUIList=sip:{tel_full}@zj.ims.chinaunicom.cn$tel:{tel_full},DefaultPUI=sip:{tel_full}@zj.ims.chinaunicom.cn;",
+                    f"SET ALIASEGROUP:PUIList=sip:{tel_full}@zj.ims.chinaunicom.cn$tel:{tel_full},AliasGroupID={pvi};",
+                ]
+            )
+        lines.append("```")
+        return "\n".join(lines)
+
+    def _gen_slfs(self, telnos: List[str]) -> str:
+        lines = ["\n## SLF\n```"]
+        for tel in telnos:
+            tel_full = f"+86575{tel}"
+            lines.extend(
+                [
+                    f"ADD SLFUSER:USERIDTYPE=1,USERID=tel:{tel_full},HSSID=1;",
+                    f"ADD SLFUSER:USERIDTYPE=1,USERID=sip:{tel_full}@zj.ims.chinaunicom.cn,HSSID=1;",
+                ]
+            )
+        lines.append("```")
+        return "\n".join(lines)
+
+    def _gen_sss(self, telnos: List[str], area: str) -> str:
+        lines = ["\n## SSS\n```"]
+        for tel in telnos:
+            tel_full = f"+86575{tel}"
+            lines.append(
+                f'ADD OSU SBR:PUI="tel:{tel_full}",NETTYPE=1,CC=86,LATA=575,TYPE="IMS",ONLCHG="OFF",OFFLCHG="ON",NOTOPEN="OFF",OWE="OFF",TSS="TSS_OFF",IRCFS="ON",IRACFSC="OFF",NSOUTG="OFF",NSICO="OFF",CARDUSER="OFF",FORCEOL="OFF",OVLAP="OFF",CFFT="OFF",CORHT="LC"&"DDD"&"SPCS"&"HF"&"LT",CIRHT="LC"&"DDD"&"IDD"&"SPCS"&"HF"&"HKMACAOTW"&"LT",OWECIRHT="LC"&"DDD"&"IDD"&"SPCS"&"HF"&"HKMACAOTW"&"LT",CTXOUTRHT="GRPIN"&"GRPOUT"&"GRPOUTNUM",CTXINRHT="GRPIN"&"GRPOUT"&"GRPOUTNUM",OWECTXOUTRHT="GRPIN"&"GRPOUT"&"GRPOUTNUM",OWECTXINRHT="GRPIN"&"GRPOUT"&"GRPOUTNUM",ACOFAD="575{area}",COMCODE=0,CUSTYPE="B2C",LANGTYPE=0,SPELINE="NO",CALLERAS=0,CALLEDAS=0,CHARGCATEGORY="FREE",CPC=0,PREPAIDTYPE="0",MAXCOMNUM=1,MEDIACAPNO=0,ZONEINDEX=65535,IMSUSERTYPE="NMIMS",OUTGOINGBLACK="NO",NOANSWERTIMER=0,OPSMSININDEX=0;'
+            )
+            lines.append(f'SET OSU OIP:PUI="tel:{tel_full}";')
+        lines.append("```")
+        return "\n".join(lines)
+
+    def _gen_eds(self, telnos: List[str]) -> str:
+        lines = ["\n## EDS\n```"]
+        for tel in telnos:
+            tel_full = f"+86575{tel}"
+            lines.append(f"Add NAPTRRec:E164NUM=575{tel},ZONENAME=6.8.e164.arpa,ORDER=10,PREFERENCE=100,FLAGS=U,SERVICE=E2U+SIP,REGEXP=!%5E.*%24!sip:{tel_full}@zj.ims.chinaunicom.cn!,TTL=3600000;")
+        lines.append("```")
+        return "\n".join(lines)
+
+    def _gen_sdc(self, telnos: List[str]) -> str:
+        lines = ["\n## SDC\n```"]
+        for tel in telnos:
+            lines.append(f'MOD USR:MODE=BYDN,DN="{tel}",NEWLRN="116448{tel}",INCALLINGPREFIX=IN_1-0,INCALLEDPREFIX=IN_1-0;')
+        lines.append("```")
+        return "\n".join(lines)
+
+    def _gen_pon(self, telnos: List[str], passwd: str, ports: List[str]) -> str:
+        lines = ["\n## PON\n```\nesl user\n"]
+        for tel, port in zip(telnos, ports):
+            tel_full = f"86575{tel}"
+            lines.extend(
+                [
+                    f"sippstnuser add {port} 0 telno {tel_full}",
+                    "",
+                    f"sippstnuser auth set {port} telno {tel_full} password-mode password",
+                    f"+{tel_full}@zj.ims.chinaunicom.cn",
+                    f"{passwd}",
+                ]
+            )
+        lines.append("```")
+        return "\n".join(lines)
 
 
 if __name__ == "__main__":
