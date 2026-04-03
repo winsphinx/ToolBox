@@ -2,51 +2,22 @@
 # -*- coding: utf-8 -*-
 
 
-from pywebio.output import put_button, put_file, put_loading, put_markdown, put_scope, put_text, use_scope
+from pywebio.output import put_button, put_file, put_loading, put_markdown, put_scope, use_scope
 from pywebio.pin import pin, put_input, put_radio
 
-from utils import display_random_pet
+from utils import add_copy_button_to_code_blocks, display_random_pet
+
+AREAS = {
+    "越城": ["10.0.2.147", "10.0.2.19"],
+    "上虞": ["10.0.2.148", "10.0.2.20"],
+    "新昌": ["10.0.2.149", "10.0.2.21"],
+    "嵊州": ["10.0.2.150", "10.0.2.22"],
+    "柯桥": ["10.0.2.151", "10.0.2.23"],
+    "诸暨": ["10.0.2.152", "10.0.2.24"],
+}
 
 
-class Ngn2IMS:
-    def __init__(self):
-        display_random_pet()
-
-        put_markdown("# NGN 迁转 IMS 脚本生成器")
-        put_radio(
-            "area",
-            label="区县",
-            options=[
-                {"label": "越城", "value": ["10.0.2.147", "10.0.2.19"]},
-                {"label": "上虞", "value": ["10.0.2.148", "10.0.2.20"]},
-                {"label": "新昌", "value": ["10.0.2.149", "10.0.2.21"]},
-                {"label": "嵊州", "value": ["10.0.2.150", "10.0.2.22"]},
-                {"label": "柯桥", "value": ["10.0.2.151", "10.0.2.23"]},
-                {"label": "诸暨", "value": ["10.0.2.152", "10.0.2.24"]},
-            ],
-            inline=True,
-        )
-        put_input(
-            "name",
-            label="名称",
-            placeholder="某某公司",
-            help_text="公司名称，不要超过 32 字符。",
-        )
-        put_button(
-            label="点击生成脚本",
-            onclick=self.update,
-        )
-        put_markdown("----")
-        put_scope("output")
-
-    @use_scope("output", clear=True)
-    def update(self):
-        with put_loading():
-            put_text("开始生成脚本...")
-            area = pin["area"]
-            name = str(pin["name"]).strip()
-            TXT = f"""
-ring check enable
+SCRIPT_TEMPLATE = """ring check enable
 
 autosave interval on
 
@@ -84,9 +55,9 @@ y
 
 if-sip attribute basic signal-port 5060 media-ip media-dhcp-vlan 101 signal-ip signal-dhcp-vlan 101 home-domain zj.ims.chinaunicom.cn
 
-if-sip attribute basic primary-proxy-ip1 {area[0]} primary-proxy-port 5060
+if-sip attribute basic primary-proxy-ip1 {primary_proxy} primary-proxy-port 5060
 
-if-sip attribute basic secondary-proxy-ip1 {area[1]} secondary-proxy-port 5060 sipprofile-index 0
+if-sip attribute basic secondary-proxy-ip1 {secondary_proxy} secondary-proxy-port 5060 sipprofile-index 0
 
 if-sip attribute basic srvlogic-index 2
 
@@ -141,10 +112,40 @@ quit
 save
 """
 
-            content = ""
-            content += TXT
 
-        put_text(content)
+class Ngn2IMS:
+    def __init__(self):
+        display_random_pet()
+        put_markdown("# NGN 迁转 IMS 脚本生成器")
+        put_radio(
+            "area",
+            label="区县",
+            options=[{"label": k, "value": v} for k, v in AREAS.items()],
+            inline=True,
+        )
+        put_input(
+            "name",
+            label="名称",
+            placeholder="某某公司",
+            help_text="公司名称，不要超过 32 字符。",
+        )
+        put_button(label="点击生成脚本", onclick=self.update)
+        put_markdown("----")
+        put_scope("output")
+
+    @use_scope("output", clear=True)
+    def update(self):
+        with put_loading():
+            primary_proxy, secondary_proxy = pin["area"]
+            name = str(pin["name"]).strip()
+            content = SCRIPT_TEMPLATE.format(
+                primary_proxy=primary_proxy,
+                secondary_proxy=secondary_proxy,
+            )
+
+        put_markdown(f"```text\n{content}\n```")
+        add_copy_button_to_code_blocks()
+
         put_file(f"{name}.txt", content.encode(), ">> 点击下载脚本 <<")
 
 
