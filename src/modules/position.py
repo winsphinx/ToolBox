@@ -29,32 +29,37 @@ class Position:
     @use_scope("output", clear=True)
     def update(self):
         with put_loading():
-            content = ""
+            if not pin["ip"] or not pin["ip"].strip():
+                put_text("请输入 IP 地址")
+                return
 
-            if pin["ip"]:
-                ips = [s.strip() for s in str(pin["ip"]).strip().split("\n")]
-                url = "http://ip-api.com/batch?lang=zh-CN"
-                response = requests.post(url, json=ips)
+            ips = [s.strip() for s in pin["ip"].strip().split("\n") if s.strip()]
+            if not ips:
+                put_text("请输入有效的 IP 地址")
+                return
 
-                if response.status_code == 200:
-                    total_data = response.json()
-                    for data in total_data:
-                        if data["status"] == "success":
-                            ip = data["query"]
-                            city = data["city"]
-                            country = data["country"]
-                            regionName = data["regionName"]
-                            lon = "东经" + str(data["lon"]) if data["lon"] >= 0 else "西经" + str(abs(data["lon"]))
-                            lat = "北纬" + str(data["lat"]) if data["lat"] >= 0 else "南纬" + str(abs(data["lat"]))
-                            content += f"IP 地址 {ip} 对应的地点是：{country} {regionName} {city}，经纬度是：{lon}°，{lat}°。\n"
-                        else:
-                            content += "无法获取地点信息。\n"
+            url = "http://ip-api.com/batch?lang=zh-CN"
+            try:
+                response = requests.post(url, json=ips, timeout=10)
+                response.raise_for_status()
+                total_data = response.json()
+            except requests.exceptions.RequestException as e:
+                put_text(f"请求失败: {e}")
+                return
+            except (ValueError, KeyError) as e:
+                put_text(f"解析响应失败: {e}")
+                return
+
+            results = []
+            for data in total_data:
+                if data.get("status") == "success":
+                    lon = f"{'东经' if data['lon'] >= 0 else '西经'}{abs(data['lon'])}°"
+                    lat = f"{'北纬' if data['lat'] >= 0 else '南纬'}{abs(data['lat'])}°"
+                    results.append(f"IP: {data['query']} → {data['country']} {data['regionName']} {data['city']} ({lon}, {lat})")
                 else:
-                    content = "请求失败。"
-            else:
-                content = "似乎没有输入内容。"
+                    results.append(f"IP: {data.get('query', 'unknown')} → 无法获取")
 
-        put_text(content)
+            put_text("\n".join(results))
 
 
 if __name__ == "__main__":
