@@ -9,6 +9,19 @@ from pywebio.pin import pin, put_file_upload, put_textarea
 
 from utils import display_random_pet
 
+RE_HOST_PATTERN = re.compile(
+    r"ip-host description (?P<user>\S+) (?P<ip>\d+\.\d+\.\d+\.\d+) "
+    r"(?P<iface>smartgroup\d+\.\d+) vlan (?P<ev>\d+) sec-vlan (?P<iv>\d+)"
+    r"(?:\s+author-temp-name\s+(?P<qos>\S+))?"
+)
+RE_INTERFACE_SEGMENT = re.compile(r"(interface smartgroup\d+\.\d+.*?)(?=interface smartgroup\d+\.\d+|!|\$)", re.DOTALL)
+RE_IFACE_NAME = re.compile(r"(smartgroup\d+\.\d+)")
+RE_IFACE_VID = re.compile(r"interface smartgroup\d+\.(\d+)")
+RE_DESCRIPTION = re.compile(r"description\s+(.+)")
+RE_IPV4 = re.compile(r"ip address\s+(\d+\.\d+\.\d+\.\d+)\s+(\d+\.\d+\.\d+\.\d+)")
+RE_IPV6 = re.compile(r"ipv6 address\s+([\da-fA-F:]+/\d+)")
+RE_DOMAIN = re.compile(r"user-info\s+(\S+)")
+
 BASE_TEMPLATE = """interface Eth-Trunk1.{vid}
   description {description}
 """
@@ -29,19 +42,6 @@ QINQ_TEMPLATE = """ encapsulation qinq-termination
  traffic-policy Anti-Urpf-In inbound
  traffic-policy NoWeb  outbound
 #
-"""
-
-QINQ_BAS_TEMPLATE = """  user-vlan {iv} qinq {ev}
-  bas
-   access-type layer2-subscriber
-   authentication-method bind
-{qos_config}   ip-trigger
-   arp-trigger
-   quit
-quit
-
-static-user {user_desc} {bas_ip} {bas_ip} gateway {gateway} interface Eth-Trunk1.{vid} vlan {iv} qinq {ev} domain-name {domain} detect export
-!
 """
 
 
@@ -93,20 +93,19 @@ class Zx2Hw:
         code = code.replace("\r\n", "\n").replace("\xa0", " ")
 
         host_map = {}
-        host_pattern = r"ip-host description (?P<user>\S+) (?P<ip>\d+\.\d+\.\d+\.\d+) (?P<iface>smartgroup\d+\.\d+) vlan (?P<ev>\d+) sec-vlan (?P<iv>\d+)(?:\s+author-temp-name\s+(?P<qos>\S+))?"
-        for m in re.finditer(host_pattern, code):
+        for m in RE_HOST_PATTERN.finditer(code):
             iface = m.group("iface")
             if iface not in host_map:
                 host_map[iface] = []
-            host_map[iface].append({"user": m.group("user"), "ip": m.group("ip"), "ev": m.group("ev"), "iv": m.group("iv"), "qos": m.group("qos") if m.group("qos") else None})
+            host_map[iface].append({"user": m.group("user"), "ip": m.group("ip"), "ev": m.group("ev"), "iv": m.group("iv"), "qos": m.group("qos")})
 
-        segments = re.findall(r"(interface smartgroup\d+\.\d+.*?(?=interface smartgroup\d+\.\d+|!|\$|$))", code, re.DOTALL)
+        segments = RE_INTERFACE_SEGMENT.findall(code)
 
         processed_interfaces = set()
 
         for segment in segments:
-            iface_match = re.search(r"(smartgroup\d+\.\d+)", segment)
-            vid_match = re.search(r"interface smartgroup\d+\.(\d+)", segment)
+            iface_match = RE_IFACE_NAME.search(segment)
+            vid_match = RE_IFACE_VID.search(segment)
             if not iface_match or not vid_match:
                 continue
 
@@ -116,11 +115,11 @@ class Zx2Hw:
             if full_iface in processed_interfaces:
                 continue
 
-            desc_match = re.search(r"description\s+(.+)", segment)
+            desc_match = RE_DESCRIPTION.search(segment)
             description = desc_match.group(1).strip() if desc_match else "No Description"
 
-            ipv4_match = re.search(r"ip address\s+(\d+\.\d+\.\d+\.\d+)\s+(\d+\.\d+\.\d+\.\d+)", segment)
-            ipv6_match = re.search(r"ipv6 address\s+([\da-fA-F:]+/\d+)", segment)
+            ipv4_match = RE_IPV4.search(segment)
+            ipv6_match = RE_IPV6.search(segment)
 
             bas_users = host_map.get(full_iface, [])
 
@@ -150,7 +149,7 @@ class Zx2Hw:
                 content += segment_out
 
             elif bas_users:
-                domain_match = re.search(r"user-info\s+(\S+)", code)
+                domain_match = RE_DOMAIN.search(code)
                 domain = domain_match.group(1) if domain_match else "jtznsx_webdeny"
 
                 first_user = bas_users[0]

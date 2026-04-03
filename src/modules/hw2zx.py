@@ -9,6 +9,22 @@ from pywebio.pin import pin, put_file_upload, put_textarea
 
 from utils import display_random_pet
 
+RE_STATIC_USER = re.compile(
+    r"static-user\s+(\S+)\s+(\d+\.\d+\.\d+\.\d+)\s+(\d+\.\d+\.\d+\.\d+).*?"
+    r"Eth-Trunk\d+\.(\d+)\s+vlan\s+(\d+)\s+qinq\s+(\d+)\s+"
+)
+RE_INTERFACE_SEGMENT = re.compile(r"(interface Eth-Trunk.*?)(?=interface Eth-Trunk|$)", re.DOTALL)
+RE_VID = re.compile(r"interface Eth-Trunk\d+\.(\d+)")
+RE_DESCRIPTION = re.compile(r"description (.+)")
+RE_IPV4 = re.compile(r"ip address (\d+\.\d+\.\d+\.\d+) (\d+\.\d+\.\d+\.\d+)")
+RE_IPV6 = re.compile(r"ipv6 address ([\da-fA-F:]+/\d+)")
+RE_POLICY = re.compile(r"traffic-policy\s+(\S+)\s+outbound")
+RE_DOT1Q = re.compile(r"dot1q termination vid (\d+)")
+RE_QINQ = re.compile(r"qinq termination pe-vid (\d+) ce-vid (\d+)")
+RE_BAS = re.compile(r"bas\n")
+RE_IPOE = re.compile(r"user-vlan (\d+) qinq (\d+)")
+RE_QOS = re.compile(r"qos-profile (\S+) (?:inbound|outbound)")
+
 DOT1Q_TEMPLATE = """interface smartgroup1.{vid}
  description {description}
   ip address {ipv4} {mask}
@@ -95,24 +111,24 @@ class Hw2Zx:
 
         code = code.replace("\r\n", "\n").replace("\xa0", " ")
 
-        static_users = re.findall(r"static-user\s+(\S+)\s+(\d+\.\d+\.\d+\.\d+)\s+(\d+\.\d+\.\d+\.\d+).*?Eth-Trunk\d+\.(\d+)\s+vlan\s+(\d+)\s+qinq\s+(\d+)\s+", code)
+        static_users = RE_STATIC_USER.findall(code)
 
-        segments = re.findall(r"(interface Eth-Trunk.*?(?=interface Eth-Trunk|$))", code, re.DOTALL)
+        segments = RE_INTERFACE_SEGMENT.findall(code)
 
         for segment in segments:
-            vid_match = re.search(r"interface Eth-Trunk\d+\.(\d+)", segment)
-            desc_match = re.search(r"description (.+)", segment)
+            vid_match = RE_VID.search(segment)
+            desc_match = RE_DESCRIPTION.search(segment)
 
-            ipv4_match = re.search(r"ip address (\d+\.\d+\.\d+\.\d+) (\d+\.\d+\.\d+\.\d+)", segment)
-            ipv6_match = re.search(r"ipv6 address ([\da-fA-F:]+/\d+)", segment)
-            policy_match = re.search(r"traffic-policy\s+(\S+)\s+outbound", segment)
+            ipv4_match = RE_IPV4.search(segment)
+            ipv6_match = RE_IPV6.search(segment)
+            policy_match = RE_POLICY.search(segment)
 
-            dot1q_match = re.search(r"dot1q termination vid (\d+)", segment)
-            qinq_match = re.search(r"qinq termination pe-vid (\d+) ce-vid (\d+)", segment)
+            dot1q_match = RE_DOT1Q.search(segment)
+            qinq_match = RE_QINQ.search(segment)
 
-            bas_match = re.search(r"bas\n", segment)
-            ipoe_match = re.search(r"user-vlan (\d+) qinq (\d+)", segment)
-            qos_match = re.search(r"qos-profile (\S+) (?:inbound|outbound)", segment)
+            bas_match = RE_BAS.search(segment)
+            ipoe_match = RE_IPOE.search(segment)
+            qos_match = RE_QOS.search(segment)
 
             if vid_match:
                 param = {
@@ -151,7 +167,8 @@ class Hw2Zx:
                 content += QINQ_BAS_TEMPLATE.format(**item)
                 for user, start_ip, end_ip, vlanid, sec_vlan, vlan in static_users:
                     if item["vid"] == vlanid:
-                        content += USER_TEMPLATE.format(**item, **locals())
+                        user_data = {"user": user, "start_ip": start_ip, "end_ip": end_ip, "sec_vlan": sec_vlan, "vlan": vlan}
+                        content += USER_TEMPLATE.format(**item, **user_data)
 
         put_markdown(f"```text\n{content}\n```")
 
