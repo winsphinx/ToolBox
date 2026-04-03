@@ -2,15 +2,22 @@
 # -*- coding: utf-8 -*-
 
 import base64
-import glob
-import os
+from pathlib import Path
 from random import choice
 
 from pywebio.output import put_html
 from pywebio.session import run_js
 
+_css_injected = False
+_pet_cache = {}
+
 
 def add_copy_button_to_code_blocks():
+    global _css_injected
+    if _css_injected:
+        return
+
+    _css_injected = True
     """
     添加 CSS 样式，用于定位和美化复制按钮
     """
@@ -110,17 +117,24 @@ def display_random_pet():
     """
     在页面显示一个随机宠物图片，点击出现爆炸粒子特效
     """
-    pets_dir = os.path.join(os.path.dirname(__file__), "resources")
-    pets = glob.glob(os.path.join(pets_dir, "*"))
+    pets_dir = Path(__file__).parent / "resources"
 
+    if not _pet_cache:
+        _pet_cache["pets"] = list(pets_dir.glob("*"))
+
+    pets = _pet_cache.get("pets", [])
     if not pets:
         return
 
     selected_pet = choice(pets)
-    with open(selected_pet, "rb") as f:
-        base64_image = base64.b64encode(f.read()).decode("utf-8")
 
-        put_html(f"""
+    if selected_pet not in _pet_cache:
+        with open(selected_pet, "rb") as f:
+            _pet_cache[selected_pet] = base64.b64encode(f.read()).decode("utf-8")
+
+    base64_image = _pet_cache[selected_pet]
+
+    put_html(f"""
         <img id="petImage"
              src="data:image/gif;base64,{base64_image}"
              onmouseover="moveImage(this)"
