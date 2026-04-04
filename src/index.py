@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from collections.abc import Callable
 from functools import partial
-from random import choice
+from random import choices
+from typing import Any
 
 from pywebio import config, start_server
 from pywebio.output import put_button, put_markdown
@@ -28,8 +30,9 @@ from utils import display_random_pet
 
 COLORS = ["primary", "secondary", "success", "danger", "warning", "info", "dark"]
 
-# 工具字典。包含：按钮名称(name), 应用名称(app), 对应的类(cls)
-TOOLS_CONFIG = [
+ToolConfig = dict[str, Any]
+
+TOOLS_CONFIG: list[ToolConfig] = [
     {"name": "轮选组脚本生成器", "app": "callgroup", "cls": Callgroup},
     {"name": "反极性脚本生成器", "app": "reversepolarity", "cls": Reversepolarity},
     {"name": "SIP 数字中继脚本生成器", "app": "sipcall", "cls": Sipcall},
@@ -49,16 +52,21 @@ TOOLS_CONFIG = [
 ]
 
 
-def create_app_index():
+def create_app_index() -> None:
     display_random_pet()
 
     put_markdown("# 七零八落工具箱")
-    for tool in TOOLS_CONFIG:
-        put_button(tool["name"], onclick=partial(go_app, tool["app"]), color=choice(COLORS))
+    colors = choices(COLORS, k=len(TOOLS_CONFIG))
+    for tool, color in zip(TOOLS_CONFIG, colors):
+        put_button(tool["name"], onclick=partial(go_app, tool["app"]), color=color)
+
+
+def _create_tool_app(cls: type) -> Callable[[], None]:
+    return lambda: cls()
 
 
 if __name__ == "__main__":
-    apps = {tool["app"]: (lambda cls=tool["cls"]: lambda: cls())() for tool in TOOLS_CONFIG}
+    apps: dict[str, Callable[[], None]] = {tool["app"]: _create_tool_app(tool["cls"]) for tool in TOOLS_CONFIG}
     apps["index"] = create_app_index
 
     config(title="7086 工具箱", theme="minty")
