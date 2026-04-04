@@ -30,33 +30,21 @@ class Reversepolarity:
     @use_scope("output", clear=True)
     def update(self):
         try:
-            numbers = [s.strip() for s in str(pin["numbers"]).strip().split("\n")]
-            data = [(x.split()[5], x.split()[2]) for x in numbers]
+            lines = [s.strip() for s in str(pin["numbers"]).strip().split("\n") if s.strip()]
+            data = [(x.split()[5], x.split()[2]) for x in lines]
 
-            content = "## PON\n```"
-            content += "esl user\n\n"
+            pon_header = "## PON\n```\n\nesl user\n\n"
+            pon_cmds = "".join(f"sippstnuser rightflag set {port} telno {num} auto-reverse-polarity enable\n\n" for num, port in data)
+            attr_cmds = "".join(f"sippstnuser attribute set {port} potslinetype PayPhone\n\n" for _, port in data)
+            pstnport_cmds = "".join(f"pstnport attribute set {port} clip-reverse-pole-pulse enable\n\n" for _, port in data)
 
-            for num, port in data:
-                content += f"sippstnuser rightflag set {port} telno {num} auto-reverse-polarity enable\n\n"
-            content += "\n"
+            sss_cmds = "".join(f'SET OSU SBR:PUI="tel:+{num}",USERTYPE="RVSPOL",CHARGCATEGORY="NORMAL";\n\n' for num, _ in data)
 
-            for _, port in data:
-                content += f"sippstnuser attribute set {port} potslinetype PayPhone\n\n"
-            content += "\nquit\n\npstnport\n\n"
-
-            for _, port in data:
-                content += f"pstnport attribute set {port} clip-reverse-pole-pulse enable\n\n"
-            content += "\nquit\n\nsave\n\n"
-
-            content += "```\n\n## SSS\n```\n"
-            for num, _ in data:
-                content += f'SET OSU SBR:PUI="tel:+{num}",USERTYPE="RVSPOL",CHARGCATEGORY="NORMAL";\n\n'
-
-            content += "```\n"
+            content = f"{pon_header}{pon_cmds}{attr_cmds}quit\n\npstnport\n\n{pstnport_cmds}quit\n\nsave\n\n```\n\n## SSS\n```\n{sss_cmds}```"
 
             put_markdown(content)
 
-            day = time.strftime("%Y-%m-%d", time.localtime(time.time()))
+            day = time.strftime("%Y-%m-%d", time.localtime())
             put_file(f"{day}.txt", content.encode(), ">> 点击下载脚本 <<")
 
         except IndexError:
