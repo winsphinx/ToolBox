@@ -12,12 +12,15 @@ from pywebio.pin import pin, put_file_upload
 from utils import display_random_pet
 
 
-def calculate_network(df):
+def calculate_network(row):
     try:
-        for host in ipaddress.summarize_address_range(ipaddress.ip_address(df["起始IP"]), ipaddress.ip_address(df["终止IP"])):
-            return host
-    except ValueError:
+        start_ip = ipaddress.ip_address(row["起始IPv4"]) if pd.notna(row["起始IPv4"]) else ipaddress.ip_address(row["起始IPv6"])
+        end_ip = ipaddress.ip_address(row["终止IPv4"]) if pd.notna(row["终止IPv4"]) else ipaddress.ip_address(row["终止IPv6"])
+        for net in ipaddress.summarize_address_range(start_ip, end_ip):
+            return net
+    except ValueError, TypeError:
         pass
+    return None
 
 
 class Flows:
@@ -56,6 +59,9 @@ class Flows:
 
     @use_scope("output", clear=True)
     def check_file(self):
+        if pin["data_file"] is None:
+            put_markdown("### 请先上传地址清单文件！")
+            return
         with put_loading():
             file = BytesIO(pin["data_file"]["content"])
             df_net = pd.read_excel(file)
@@ -70,11 +76,17 @@ class Flows:
         else:
             put_markdown("### 原始地址文件中有以下不规范地址格式，请处理后重新上传。")
             put_markdown("不要带有括号，也不要用逗号、破折号带多个地址。")
-            put_html(df_net[df_net["网络"].isnull()].to_html(border=0))
+            put_html(err.to_html(border=0))
         self.networks = df_net
 
     @use_scope("output", clear=True)
     def match_file(self):
+        if pin["host_file"] is None:
+            put_markdown("### 请先上传主机清单文件！")
+            return
+        if self.networks is None:
+            put_markdown("### 请先检查地址清单文件！")
+            return
         with put_loading():
             file = BytesIO(pin["host_file"]["content"])
             df_all = pd.read_excel(file, sheet_name=None)
@@ -87,15 +99,20 @@ class Flows:
             sort_keys = radio("选择要排序汇总的列名（单选）", cols, value=cols[-2], required=True)
             df_host = df_host.groupby(by=[group_key]).sum().sort_values(by=[sort_keys]).reset_index().head(100)
 
+            net_list = list(self.networks["网络"])
+            net_info = {str(net): self.networks.loc[self.networks["网络"] == net, ["工程名称", "业务号码", "装机地址"]].values[0] for net in net_list if net is not None}
+
             content = f"{group_key},{sort_keys},所属网络,名称,业务号码,装机地址\n"
             for _, row in df_host.iterrows():
-                for net in self.networks["网络"]:
-                    ip = ipaddress.ip_address(row[group_key])
-                    if ip in net:
-                        res = self.networks.loc[self.networks["网络"] == net, ["工程名称", "业务号码", "装机地址"]].values[0]
+                ip = ipaddress.ip_address(row[group_key])
+                matched = False
+                for net in net_list:
+                    if net is not None and ip in net:
+                        res = net_info[str(net)]
                         content += f"{row[group_key]},{row[sort_keys]},{str(net)},{res[0]},{str(res[1])},{res[2]}\n"
+                        matched = True
                         break
-                else:
+                if not matched:
                     content += f"{row[group_key]},{row[sort_keys]},,,,\n"
 
         put_file(
