@@ -9,7 +9,7 @@ from pywebio.pin import pin, put_file_upload
 
 from utils import display_random_pet
 
-dic1 = {
+PROVINCE_MAP = {
     "浙江": "浙江省",
     "北京": "北京市",
     "天津": "天津市",
@@ -44,7 +44,7 @@ dic1 = {
     "香港": "香港特别行政区",
     "澳门": "澳门特别行政区",
 }
-dic2 = {
+CITY_MAP = {
     "绍兴": "绍兴市",
     "杭州": "杭州市",
     "嘉兴": "嘉兴市",
@@ -57,6 +57,8 @@ dic2 = {
     "舟山": "舟山市",
     "湖州": "湖州市",
 }
+RSJ_REQUIRED_COLS = ["手机号码", "运营商"]
+SGS_REQUIRED_COLS = ["PROV_ID_NAME", "AREA_DESC", "svc_num"]
 
 
 class Roamusers:
@@ -99,8 +101,9 @@ class Roamusers:
 
                 file2 = BytesIO(pin["sgs_file"]["content"])
                 sgs = pd.read_csv(file2, encoding="gb18030")
-                sgs["PROV_ID_NAME"] = sgs["PROV_ID_NAME"].replace(dic1)
-                sgs["AREA_DESC"] = sgs["AREA_DESC"].replace(dic2).where(sgs["AREA_DESC"].isin(dic2.keys()), "")
+
+                sgs["PROV_ID_NAME"] = sgs["PROV_ID_NAME"].replace(PROVINCE_MAP)
+                sgs["AREA_DESC"] = sgs["AREA_DESC"].replace(CITY_MAP).where(sgs["AREA_DESC"].isin(list(CITY_MAP.keys())), "")
 
                 res = pd.merge(rsj, sgs, right_on="svc_num", left_on="手机号码", how="left")
                 res = res.drop(columns=["手机号码", "运营商", "svc_num"])
@@ -111,6 +114,8 @@ class Roamusers:
                 content = output_buffer.getvalue()
                 put_file("output.xlsx", content, ">> 点击下载生成后的文件 <<")
 
+        except KeyError as e:
+            put_text(f"文件缺少必要列: {e}")
         except Exception as e:
             put_text(f"输入不规范，输出两行泪。\n\n{e}")
 
