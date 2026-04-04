@@ -6,7 +6,10 @@ import re
 from pywebio.output import put_button, put_file, put_markdown, put_scope, put_text, use_scope
 from pywebio.pin import pin, put_input, put_textarea
 
-from utils import display_random_pet
+from utils import add_copy_button_to_code_blocks, display_random_pet
+
+RE_5XXXX = re.compile(r"^5\d{4}$")
+RE_8NUM = re.compile(r"^\d{8}$")
 
 
 class Callgroup:
@@ -45,39 +48,45 @@ class Callgroup:
         put_markdown("----")
         put_scope("output")
 
-    def check_5xxxx(self, n):
-        return bool(re.match(r"^5\d{4}$", n))
+    def check_5xxxx(self, n: str) -> bool:
+        return bool(RE_5XXXX.match(n))
 
-    def check_8num(self, n):
-        return bool(re.match(r"^\d{8}$", n))
+    def check_8num(self, n: str) -> bool:
+        return bool(RE_8NUM.match(n))
 
     @use_scope("output", clear=True)
     def update(self):
         code = str(pin["code"]).strip()
         name = str(pin["name"]).strip()
         main_number = str(pin["main_number"]).strip()
-        sub_numbers = [s.strip() for s in str(pin["sub_numbers"]).strip().split("\n")]
+        sub_numbers = [s.strip() for s in str(pin["sub_numbers"]).strip().split("\n") if s.strip()]
 
         if not self.check_5xxxx(code):
-            put_text("错误：请输入 5 开头的 5 位编号！")
+            put_text("错误：编号是 5 开头的 5 位数字！")
             return
 
         if not self.check_8num(main_number):
             put_text("错误：请输入 8 位引示号！")
             return
 
-        content = f'ADD CALLGROUP:GRPNO="{code}",NAME="{name}";\n'
-        content += f'ADD CALLGRPPSI:PSI="tel:+86575{main_number}",GRPNO="{code}";\n'
-        content += f'ADD CALLGRPPSI:PSI="sip:+86575{main_number}@zj.ims.chinaunicom.cn",GRPNO="{code}";\n'
+        invalid_nums = [int(n) for n in sub_numbers if not self.check_8num(n)]
+        if invalid_nums:
+            put_text(f"错误：以下号码不是 8 位：{invalid_nums}")
+            return
+
+        lines = [
+            f'ADD CALLGROUP:GRPNO="{code}",NAME="{name}";',
+            f'ADD CALLGRPPSI:PSI="tel:+86575{main_number}",GRPNO="{code}";',
+            f'ADD CALLGRPPSI:PSI="sip:+86575{main_number}@zj.ims.chinaunicom.cn",GRPNO="{code}";',
+        ]
         for n in sub_numbers:
-            if not self.check_8num(n):
-                put_text("错误：请输入 8 位号码！中间不要有空行。")
-                return
+            lines.append(f'SET OSU FA:PUI="tel:+86575{n}",PILOT="tel:+86575{main_number}",DISPILOT="YES",CHARGPILOT="YES";')
+        lines.append(f'SHOW CALLGROUPPUI:PSI="tel:+86575{main_number}";')
 
-            content += f'SET OSU FA:PUI="tel:+86575{n}",PILOT="tel:+86575{main_number}",DISPILOT="YES",CHARGPILOT="YES";\n'
-        content += f'SHOW CALLGROUPPUI:PSI="tel:+86575{main_number}";\n'
+        content = "\n".join(lines)
+        put_markdown(f"```text\n{content}\n```")
+        add_copy_button_to_code_blocks()
 
-        put_text(content)
         put_file(f"{code}-{name}.txt", content.encode(), ">> 点击下载脚本 <<")
         put_markdown("**重要提醒：两个 SSS 都要加一遍。**")
 
