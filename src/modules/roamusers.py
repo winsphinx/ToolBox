@@ -112,7 +112,8 @@ class Roamusers:
                 output_buffer = BytesIO()
                 res.to_excel(output_buffer, sheet_name="Sheet1", index=False)
                 content = output_buffer.getvalue()
-                put_file("output.xlsx", content, ">> 点击下载生成后的文件 <<")
+
+            put_file("output.xlsx", content, ">> 点击下载生成后的文件 <<")
 
         except KeyError as e:
             put_text(f"文件缺少必要列: {e}")
