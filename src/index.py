@@ -19,6 +19,7 @@ from modules.ipcal import IPcal
 from modules.location import Location
 from modules.mobaxterm import Mobaxterm
 from modules.ngn2ims import Ngn2IMS
+from modules.pcdn import Pcdn
 from modules.position import Position
 from modules.qrcode import QRCode
 from modules.reversepolarity import Reversepolarity
@@ -48,7 +49,8 @@ TOOLS_CONFIG: list[ToolConfig] = [
     {"name": "漫游用户统计工具", "app": "roamusers", "cls": Roamusers},
     {"name": "MobaXterm 注册工具", "app": "mobaxterm", "cls": Mobaxterm},
     {"name": "HW 转 ZX 专线脚本生成器", "app": "hw2zx", "cls": Hw2Zx},
-    {"name": "ZX 转 HW 专线脚本生成器", "app": "zx2hw2", "cls": Zx2Hw},
+    {"name": "ZX 转 HW 专线脚本生成器", "app": "zx2hw", "cls": Zx2Hw},
+    {"name": "PCDN 脚本匹配", "app": "pcdn", "cls": Pcdn},
 ]
 
 
