@@ -44,7 +44,7 @@ class Pcdn:
 
                     file_content = upload_info["content"]
                     file = BytesIO(file_content)
-                    df = pd.read_excel(file)
+                    df = pd.read_excel(file, header=1)
 
                     df["日期"] = pd.to_datetime(df["日期"], errors="coerce")
                     df = df.dropna(subset=["日期", "账号"])
@@ -55,6 +55,7 @@ class Pcdn:
                     df_final.to_excel(output_buffer, sheet_name="Sheet1", index=False)
                     output_buffer.seek(0)
                     content = output_buffer.getvalue()
+
                 put_file("output.xlsx", content, ">> 点击下载生成后的文件 <<")
 
             except KeyError as e:
