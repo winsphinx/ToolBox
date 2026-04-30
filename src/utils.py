@@ -8,16 +8,10 @@ from random import choice
 from pywebio.output import put_html
 from pywebio.session import run_js
 
-_css_injected = False
 _pet_cache = {}
 
 
 def add_copy_button_to_code_blocks():
-    global _css_injected
-    if _css_injected:
-        return
-
-    _css_injected = True
     """
     添加 CSS 样式，用于定位和美化复制按钮
     """
