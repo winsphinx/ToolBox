@@ -8,8 +8,6 @@ from random import choice
 from pywebio.output import put_html
 from pywebio.session import run_js
 
-_pet_cache = {}
-
 
 def add_copy_button_to_code_blocks():
     """
@@ -111,6 +109,8 @@ def display_random_pet():
     """
     在页面显示一个随机宠物图片，点击出现爆炸粒子特效
     """
+    _pet_cache = {}
+
     pets_dir = Path(__file__).parent / "resources"
 
     if not _pet_cache:
