@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 import requests
 from pywebio.output import put_button, put_markdown, put_scope, put_table, use_scope
@@ -14,18 +13,18 @@ class Location:
 
         put_markdown("# 地理位置范围查询工具")
         put_input(
-            "keyword",
+            name="keyword",
             label="要定位的关键词",
             placeholder="超市",
         )
         put_input(
-            "location",
+            name="location",
             label="中心位置经纬度",
             placeholder="120.00,30.00",
             help_text="经纬度用英文逗号隔开，小数最多6位。",
         )
         put_input(
-            "radius",
+            name="radius",
             label="搜寻范围",
             placeholder="5000",
             help_text="单位：米。",
@@ -37,7 +36,7 @@ class Location:
         put_markdown("----")
         put_scope("output")
 
-    @use_scope("output", clear=True)
+    @use_scope(name="output", clear=True)
     def update(self):
         content = [["名称", "地址", "区县", "城市"]]
         keyword = str(pin["keyword"]).strip()

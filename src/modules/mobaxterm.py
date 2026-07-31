@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 
 import zipfile
 from io import BytesIO
@@ -59,7 +57,7 @@ class Mobaxterm:
         put_row(
             [
                 put_select(
-                    "selector",
+                    name="selector",
                     options=[
                         ("Professional", 1, True),
                         ("Educational", 3),
@@ -69,19 +67,19 @@ class Mobaxterm:
                 ),
                 None,
                 put_input(
-                    "username",
+                    name="username",
                     label="用户名",
                     placeholder="USERNAME",
                 ),
                 None,
                 put_input(
-                    "version",
+                    name="version",
                     label="版本号",
                     placeholder="23.4",
                 ),
                 None,
                 put_input(
-                    "count",
+                    name="count",
                     label="授权数量",
                     placeholder="1",
                 ),
@@ -94,7 +92,7 @@ class Mobaxterm:
         put_markdown("----")
         put_scope("output")
 
-    @use_scope("output", clear=True)
+    @use_scope(name="output", clear=True)
     def update(self):
         license_type = pin["selector"]
         username = str(pin["username"]).strip()
@@ -111,9 +109,9 @@ class Mobaxterm:
         zip_buffer.seek(0)
 
         put_file(
-            "Custom.mxtpro",
-            zip_buffer.getvalue(),
-            ">> 点击下载生成后的文件，并放到 MobaXterm.exe 同级目录。<<",
+            name="Custom.mxtpro",
+            content=zip_buffer.getvalue(),
+            label=">> 点击下载生成后的文件，并放到 MobaXterm.exe 同级目录。<<",
         )
 
 

@@ -1,23 +1,12 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 import re
 import time
-from typing import List, Tuple
 
 from pywebio.output import put_button, put_file, put_markdown, put_scope, use_scope
 from pywebio.pin import pin, put_input, put_radio, put_textarea
 
 from utils import add_copy_button_to_code_blocks, display_random_pet
-
-AREA_OPTIONS = [
-    {"label": "越城", "value": "01"},
-    {"label": "上虞", "value": "02"},
-    {"label": "嵊州", "value": "03"},
-    {"label": "新昌", "value": "04"},
-    {"label": "诸暨", "value": "05"},
-    {"label": "柯桥", "value": "06"},
-]
 
 RE_IMS = re.compile(r"^\d{8}$")
 RE_PORT = re.compile(r"^\d+/\d+/\d+$")
@@ -29,25 +18,32 @@ class AddIMS:
 
         put_markdown("# 手工IMS加号码脚本生成器")
         put_radio(
-            "area",
+            name="area",
             label="区县",
-            options=AREA_OPTIONS,
+            options=[
+                ("越城", 1),
+                ("上虞", 2),
+                ("嵊州", 3),
+                ("新昌", 4),
+                ("诸暨", 5),
+                ("柯桥", 6),
+            ],
             inline=True,
         )
         put_textarea(
-            "telnos",
+            name="telnos",
             label="号码",
             placeholder="88881234\n88885678\n...",
             help_text="8位号码。有多个一行一个。",
         )
         put_input(
-            "passwd",
+            name="passwd",
             label="密码",
             placeholder="Fxxxxx",
             help_text="SIP的注册密码，在工单上有。",
         )
         put_textarea(
-            "ports",
+            name="ports",
             label="端口",
             placeholder="0/1/2\n0/1/3\n...",
             help_text="GPON的端口号，在工单上有。顺序和号码一一对应。",
@@ -59,20 +55,7 @@ class AddIMS:
         put_markdown("----")
         put_scope("output")
 
-    @use_scope("output", clear=True)
-    def update(self):
-        try:
-            telnos, passwd, ports, area = self._validate_input()
-        except ValueError as e:
-            put_markdown(f"# 错误\n{str(e)}")
-        else:
-            content = self._generate_script(telnos, passwd, ports, area)
-            put_markdown(content)
-            add_copy_button_to_code_blocks()
-            day = time.strftime("%Y-%m-%d")
-            put_file(f"{day}.md", content.encode(), ">> 点击下载脚本 <<")
-
-    def _validate_input(self) -> Tuple[List[str], str, List[str], str]:
+    def _validate_input(self) -> tuple[list[str], str, list[str], str]:
         telnos = [s.strip() for s in str(pin["telnos"]).strip().split("\n") if s.strip()]
         passwd = str(pin["passwd"]).strip()
         ports = [s.strip() for s in str(pin["ports"]).strip().split("\n") if s.strip()]
@@ -92,7 +75,7 @@ class AddIMS:
 
         return telnos, passwd, ports, area
 
-    def _generate_script(self, telnos: List[str], passwd: str, ports: List[str], area: str) -> str:
+    def _generate_script(self, telnos: list[str], passwd: str, ports: list[str], area: str) -> str:
         return "\n".join(
             [
                 self._gen_hss(telnos, passwd),
@@ -104,7 +87,7 @@ class AddIMS:
             ]
         )
 
-    def _gen_hss(self, telnos: List[str], passwd: str) -> str:
+    def _gen_hss(self, telnos: list[str], passwd: str) -> str:
         lines = ["## HSS\n```"]
         for tel in telnos:
             tel_full = f"+86575{tel}"
@@ -123,7 +106,7 @@ class AddIMS:
         lines.append("```")
         return "\n".join(lines)
 
-    def _gen_slfs(self, telnos: List[str]) -> str:
+    def _gen_slfs(self, telnos: list[str]) -> str:
         lines = ["\n## SLF\n```"]
         for tel in telnos:
             tel_full = f"+86575{tel}"
@@ -136,18 +119,18 @@ class AddIMS:
         lines.append("```")
         return "\n".join(lines)
 
-    def _gen_sss(self, telnos: List[str], area: str) -> str:
+    def _gen_sss(self, telnos: list[str], area: str) -> str:
         lines = ["\n## SSS\n```"]
         for tel in telnos:
             tel_full = f"+86575{tel}"
             lines.append(
-                f'ADD OSU SBR:PUI="tel:{tel_full}",NETTYPE=1,CC=86,LATA=575,TYPE="IMS",ONLCHG="OFF",OFFLCHG="ON",NOTOPEN="OFF",OWE="OFF",TSS="TSS_OFF",IRCFS="ON",IRACFSC="OFF",NSOUTG="OFF",NSICO="OFF",CARDUSER="OFF",FORCEOL="OFF",OVLAP="OFF",CFFT="OFF",CORHT="LC"&"DDD"&"SPCS"&"HF"&"LT",CIRHT="LC"&"DDD"&"IDD"&"SPCS"&"HF"&"HKMACAOTW"&"LT",OWECIRHT="LC"&"DDD"&"IDD"&"SPCS"&"HF"&"HKMACAOTW"&"LT",CTXOUTRHT="GRPIN"&"GRPOUT"&"GRPOUTNUM",CTXINRHT="GRPIN"&"GRPOUT"&"GRPOUTNUM",OWECTXOUTRHT="GRPIN"&"GRPOUT"&"GRPOUTNUM",OWECTXINRHT="GRPIN"&"GRPOUT"&"GRPOUTNUM",ACOFAD="575{area}",COMCODE=0,CUSTYPE="B2C",LANGTYPE=0,SPELINE="NO",CALLERAS=0,CALLEDAS=0,CHARGCATEGORY="FREE",CPC=0,PREPAIDTYPE="0",MAXCOMNUM=1,MEDIACAPNO=0,ZONEINDEX=65535,IMSUSERTYPE="NMIMS",OUTGOINGBLACK="NO",NOANSWERTIMER=0,OPSMSININDEX=0;'
+                f'ADD OSU SBR:PUI="tel:{tel_full}",NETTYPE=1,CC=86,LATA=575,TYPE="IMS",ONLCHG="OFF",OFFLCHG="ON",NOTOPEN="OFF",OWE="OFF",TSS="TSS_OFF",IRCFS="ON",IRACFSC="OFF",NSOUTG="OFF",NSICO="OFF",CARDUSER="OFF",FORCEOL="OFF",OVLAP="OFF",CFFT="OFF",CORHT="LC"&"DDD"&"SPCS"&"HF"&"LT",CIRHT="LC"&"DDD"&"IDD"&"SPCS"&"HF"&"HKMACAOTW"&"LT",OWECIRHT="LC"&"DDD"&"IDD"&"SPCS"&"HF"&"HKMACAOTW"&"LT",CTXOUTRHT="GRPIN"&"GRPOUT"&"GRPOUTNUM",CTXINRHT="GRPIN"&"GRPOUT"&"GRPOUTNUM",OWECTXOUTRHT="GRPIN"&"GRPOUT"&"GRPOUTNUM",OWECTXINRHT="GRPIN"&"GRPOUT"&"GRPOUTNUM",ACOFAD="5750{area!s}",COMCODE=0,CUSTYPE="B2C",LANGTYPE=0,SPELINE="NO",CALLERAS=0,CALLEDAS=0,CHARGCATEGORY="FREE",CPC=0,PREPAIDTYPE="0",MAXCOMNUM=1,MEDIACAPNO=0,ZONEINDEX=65535,IMSUSERTYPE="NMIMS",OUTGOINGBLACK="NO",NOANSWERTIMER=0,OPSMSININDEX=0;'
             )
             lines.append(f'SET OSU OIP:PUI="tel:{tel_full}";')
         lines.append("```")
         return "\n".join(lines)
 
-    def _gen_eds(self, telnos: List[str]) -> str:
+    def _gen_eds(self, telnos: list[str]) -> str:
         lines = ["\n## EDS\n```"]
         for tel in telnos:
             tel_full = f"+86575{tel}"
@@ -155,14 +138,14 @@ class AddIMS:
         lines.append("```")
         return "\n".join(lines)
 
-    def _gen_sdc(self, telnos: List[str]) -> str:
+    def _gen_sdc(self, telnos: list[str]) -> str:
         lines = ["\n## SDC\n```"]
         for tel in telnos:
             lines.append(f'MOD USR:MODE=BYDN,DN="{tel}",NEWLRN="116448{tel}",INCALLINGPREFIX=IN_1-0,INCALLEDPREFIX=IN_1-0;')
         lines.append("```")
         return "\n".join(lines)
 
-    def _gen_pon(self, telnos: List[str], passwd: str, ports: List[str]) -> str:
+    def _gen_pon(self, telnos: list[str], passwd: str, ports: list[str]) -> str:
         lines = ["\n## PON\n```\nesl user\n"]
         for tel, port in zip(telnos, ports):
             tel_full = f"86575{tel}"
@@ -177,6 +160,23 @@ class AddIMS:
             )
         lines.append("```")
         return "\n".join(lines)
+
+    @use_scope(name="output", clear=True)
+    def update(self):
+        try:
+            telnos, passwd, ports, area = self._validate_input()
+        except ValueError as e:
+            put_markdown(f"# 错误\n{e!s}")
+        else:
+            content = self._generate_script(telnos, passwd, ports, area)
+            put_markdown(content)
+            add_copy_button_to_code_blocks()
+            day = time.strftime("%Y-%m-%d")
+            put_file(
+                name=f"{day}.md",
+                content=content.encode(),
+                label=">> 点击下载脚本 <<",
+            )
 
 
 if __name__ == "__main__":

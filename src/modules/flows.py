@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 import ipaddress
 from io import BytesIO
@@ -79,7 +78,7 @@ class Flows:
             put_html(err.to_html(border=0))
         self.networks = df_net
 
-    @use_scope("output", clear=True)
+    @use_scope(name="output", clear=True)
     def match_file(self):
         if pin["host_file"] is None:
             put_markdown("### 请先上传主机清单文件！")
@@ -90,7 +89,7 @@ class Flows:
         with put_loading():
             file = BytesIO(pin["host_file"]["content"])
             df_all = pd.read_excel(file, sheet_name=None)
-            sum_sheet = checkbox("选择要汇总的子表（对于城域网选1+3，对于IDC选2+4）", [k for k in df_all.keys()])
+            sum_sheet = checkbox("选择要汇总的子表（对于城域网选1+3，对于IDC选2+4）", list(df_all.keys()))
             df_host = pd.concat([df_all[x] for x in sum_sheet])
 
             cols = df_host.columns.to_list()
@@ -109,16 +108,16 @@ class Flows:
                 for net in net_list:
                     if net is not None and ip in net:
                         res = net_info[str(net)]
-                        content += f"{row[group_key]},{row[sort_keys]},{str(net)},{res[0]},{str(res[1])},{res[2]}\n"
+                        content += f"{row[group_key]},{row[sort_keys]},{net!s},{res[0]},{res[1]!s},{res[2]}\n"
                         matched = True
                         break
                 if not matched:
                     content += f"{row[group_key]},{row[sort_keys]},,,,\n"
 
         put_file(
-            "导出结果.csv",
-            content.encode("utf-8-sig"),
-            ">> 点击下载生成后的文件 <<",
+            name="导出结果.csv",
+            content=content.encode("utf-8-sig"),
+            label=">> 点击下载生成后的文件 <<",
         )
 
 

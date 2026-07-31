@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+
 from math import ceil
 from random import choice
 
@@ -235,109 +236,109 @@ class Sipcall:
 
         put_markdown("# SIP 数字中继脚本生成器")
         put_radio(
-            "mode",
+            name="mode",
             label="组网模式",
             options=["对等方式", "签约方式"],
             inline=True,
         )
         put_radio(
-            "isbc_number",
+            name="isbc_number",
             label="选择ISBC",
             options=["ISBC-3", "ISBC-4"],
             inline=True,
         )
         put_input(
-            "name",
+            name="name",
             label="名称",
             placeholder="某某公司",
             help_text="中继组的名称，不要超过 32 字符。",
         )
         put_input(
-            "IP",
+            name="IP",
             label="地址",
             placeholder="10.33.x.x",
             help_text="分配的 IP 地址。",
         )
         put_input(
-            "nexthop",
+            name="nexthop",
             label="signal nexthop",
             placeholder="5xxx",
             help_text="绍兴从 5000 开始编号。",
         )
         put_input(
-            "pool",
+            name="pool",
             label="pool ID",
             placeholder="5xxx",
             help_text="绍兴从 5000 开始编号。",
         )
         put_input(
-            "routes",
+            name="routes",
             label="route analyser",
             placeholder="5xxx/5xxx",
             help_text="绍兴从 5000 开始编号。两个值，中间用 / 隔开。",
         )
         put_input(
-            "cac",
+            name="cac",
             label="呼叫能力 cac perfile",
             placeholder="5xxx",
             help_text="绍兴从 5000 开始编号。",
         )
         put_input(
-            "max",
+            name="max",
             label="并发数",
             placeholder="100",
             help_text="按需要填。",
         )
         put_input(
-            "mgcf",
+            name="mgcf",
             label="MGCF pool ID",
             placeholder="1xx",
             help_text="绍兴从 100 开始编号。",
         )
         put_input(
-            "isbc",
+            name="isbc",
             label="与MGCF对接的 ISBC 端口",
             placeholder="5xxx",
             help_text="绍兴从 5140-5159 编号。",
         )
         put_input(
-            "adj",
+            name="adj",
             label="邻接局编号",
             placeholder="35xx",
             help_text="绍兴从 3500-3599 编号。",
         )
         put_input(
-            "node",
+            name="node",
             label="节点号",
             placeholder="6xx",
             help_text="绍兴从 650-699 开始编号。",
         )
         put_input(
-            "brs",
+            name="brs",
             label="连接编号",
             placeholder="23xx/23xx",
             help_text="绍兴从 2300-2399 编号。两个值，中间用 / 隔开。",
         )
         put_input(
-            "link",
+            name="link",
             label="信令链路号",
             placeholder="23xx",
             help_text="绍兴从 2300-2399 编号。",
         )
         put_input(
-            "tg",
+            name="tg",
             label="中继组号",
             placeholder="23xx",
             help_text="绍兴从 2300-2399 编号。",
         )
         put_input(
-            "auth",
+            name="auth",
             label="用户鉴权选择子",
             placeholder="18xx",
             help_text="绍兴原有编号 250-299 已用完，现在从 1800-1899 编号。",
         )
         put_textarea(
-            "sub_numbers",
+            name="sub_numbers",
             label="引示号",
             placeholder="88888888\n77777777\n66666666\n96xxxx\n...",
             help_text="每行一个号码，回车分割。",
@@ -349,7 +350,7 @@ class Sipcall:
         put_markdown("----")
         put_scope("output")
 
-    @use_scope("output", clear=True)
+    @use_scope(name="output", clear=True)
     def update(self):
         with put_loading():
             put_text("开始生成脚本...")
@@ -403,7 +404,11 @@ class Sipcall:
             content = "\n".join(parts)
 
         put_text(content)
-        put_file(f"{name}.txt", content.encode(), ">> 点击下载脚本 <<")
+        put_file(
+            name=f"{name}.txt",
+            content=content.encode(),
+            label=">> 点击下载脚本 <<",
+        )
 
 
 if __name__ == "__main__":

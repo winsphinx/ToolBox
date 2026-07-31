@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 import time
 
@@ -28,7 +27,7 @@ class Address:
 
         put_markdown("# 地址-经纬度 查询工具")
         put_textarea(
-            "address",
+            name="address",
             label="地址",
             placeholder="地址1\n地址2\n...或者\n经度,纬度\n...",
             help_text="每行一个地址，或一对经纬度(英文逗号分割)。一次查询只能相同类型，不能混合。",
@@ -55,7 +54,7 @@ class Address:
         j = _api_request(url, params)
         return j["geocodes"][0]["location"]
 
-    @use_scope("output", clear=True)
+    @use_scope(name="output", clear=True)
     def query_address(self):
         try:
             addresses = _parse_input(str(pin["address"]))

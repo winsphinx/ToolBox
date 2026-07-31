@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 import json
 import time
@@ -125,7 +124,7 @@ class Sites:
         put_markdown("# 基站稽核")
 
         file = file_upload(
-            "上传文件",
+            label="上传文件",
             accept=".xlsx",
             placeholder="在这里上传一个表格。",
             help_text="必须包括 6 个子表，其表名为：5G AAU、4G RRU、5G物理基站表、4G物理基站表、塔租费用表、塔租数据库。",
@@ -139,14 +138,14 @@ class Sites:
 
         put_markdown("### 处理后的数据预览")
         put_datatable(
-            format_data(data),
+            records=format_data(data),
             instance_id="sites",
         )
 
         put_file(
-            f"{time.strftime('%Y-%m-%d', time.localtime(time.time()))}.csv",
-            content.encode("utf-8-sig"),
-            ">> 点击下载生成后的文件 <<",
+            name=f"{time.strftime('%Y-%m-%d', time.localtime(time.time()))}.csv",
+            content=content.encode("utf-8-sig"),
+            label=">> 点击下载生成后的文件 <<",
         )
 
 

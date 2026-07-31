@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 import base64
+from functools import cache
 from pathlib import Path
 from random import choice
 
@@ -14,7 +14,7 @@ def add_copy_button_to_code_blocks():
     添加 CSS 样式，用于定位和美化复制按钮
     """
     put_html(
-        """
+        html="""
         <style>
         pre {
             position: relative; /* 设定 pre 元素为相对定位，作为按钮绝对定位的参照 */
@@ -50,7 +50,7 @@ def add_copy_button_to_code_blocks():
 
     # 注入 JavaScript 以查找所有代码块并添加复制按钮
     run_js(
-        """
+        code_="""
         (function () {
             // 查找页面上所有由 Markdown 生成的代码块（通常是 pre > code 标签）
             const codeBlocks = document.querySelectorAll('pre > code');
@@ -105,30 +105,30 @@ def add_copy_button_to_code_blocks():
     )
 
 
+@cache
+def _get_pets():
+    return list((Path(__file__).parent / "resources").glob("*"))
+
+
+@cache
+def _get_pet_base64(pet_path: Path):
+    with open(pet_path, "rb") as f:
+        return base64.b64encode(f.read()).decode("utf-8")
+
+
 def display_random_pet():
     """
     在页面显示一个随机宠物图片，点击出现爆炸粒子特效
     """
-    _pet_cache = {}
-
-    pets_dir = Path(__file__).parent / "resources"
-
-    if not _pet_cache:
-        _pet_cache["pets"] = list(pets_dir.glob("*"))
-
-    pets = _pet_cache.get("pets", [])
+    pets = _get_pets()
     if not pets:
         return
 
     selected_pet = choice(pets)
+    base64_image = _get_pet_base64(selected_pet)
 
-    if selected_pet not in _pet_cache:
-        with open(selected_pet, "rb") as f:
-            _pet_cache[selected_pet] = base64.b64encode(f.read()).decode("utf-8")
-
-    base64_image = _pet_cache[selected_pet]
-
-    put_html(f"""
+    put_html(
+        html=f"""
         <img id="petImage"
              src="data:image/gif;base64,{base64_image}"
              onmouseover="moveImage(this)"
@@ -271,4 +271,5 @@ def display_random_pet():
             }}
         }});
         </script>
-        """)
+        """
+    )

@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 import requests
 from pywebio.output import put_button, put_loading, put_markdown, put_scope, put_text, use_scope
@@ -14,7 +13,7 @@ class Position:
 
         put_markdown("# IP 地址-地理位置 查询工具")
         put_textarea(
-            "ip",
+            name="ip",
             label="IP 地址",
             placeholder="192.168.1.100\n110.0.0.0\n...",
             help_text="输入一个或多个 IP 地址，每行一个。因 api 限制，每分钟最大查询请求为15次，超出会被封禁1小时。",
@@ -26,7 +25,7 @@ class Position:
         put_markdown("----")
         put_scope("output")
 
-    @use_scope("output", clear=True)
+    @use_scope(name="output", clear=True)
     def update(self):
         with put_loading():
             if not pin["ip"] or not pin["ip"].strip():

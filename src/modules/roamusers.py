@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 from io import BytesIO
 
@@ -90,7 +89,7 @@ class Roamusers:
         put_markdown("----")
         put_scope("output")
 
-    @use_scope("output", clear=True)
+    @use_scope(name="output", clear=True)
     def match_file(self):
         try:
             with put_loading():
@@ -113,7 +112,11 @@ class Roamusers:
                 res.to_excel(output_buffer, sheet_name="Sheet1", index=False)
                 content = output_buffer.getvalue()
 
-            put_file("output.xlsx", content, ">> 点击下载生成后的文件 <<")
+            put_file(
+                name="output.xlsx",
+                content=content,
+                label=">> 点击下载生成后的文件 <<",
+            )
 
         except KeyError as e:
             put_text(f"文件缺少必要列: {e}")

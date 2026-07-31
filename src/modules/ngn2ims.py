@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 
 from pywebio.output import put_button, put_file, put_loading, put_markdown, put_scope, use_scope
 from pywebio.pin import pin, put_input, put_radio
@@ -118,13 +116,13 @@ class Ngn2IMS:
         display_random_pet()
         put_markdown("# NGN 迁转 IMS 脚本生成器")
         put_radio(
-            "area",
+            name="area",
             label="区县",
             options=[{"label": k, "value": v} for k, v in AREAS.items()],
             inline=True,
         )
         put_input(
-            "name",
+            name="name",
             label="名称",
             placeholder="某某公司",
             help_text="公司名称，不要超过 32 字符。",
@@ -133,7 +131,7 @@ class Ngn2IMS:
         put_markdown("----")
         put_scope("output")
 
-    @use_scope("output", clear=True)
+    @use_scope(name="output", clear=True)
     def update(self):
         with put_loading():
             primary_proxy, secondary_proxy = pin["area"]
@@ -146,7 +144,11 @@ class Ngn2IMS:
         put_markdown(f"```text\n{content}\n```")
         add_copy_button_to_code_blocks()
 
-        put_file(f"{name}.txt", content.encode(), ">> 点击下载脚本 <<")
+        put_file(
+            name=f"{name}.txt",
+            content=content.encode(),
+            label=">> 点击下载脚本 <<",
+        )
 
 
 if __name__ == "__main__":

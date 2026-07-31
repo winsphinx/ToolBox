@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 from collections.abc import Callable
 from functools import partial
@@ -60,7 +59,7 @@ def create_app_index() -> None:
     put_markdown("# 七零八落工具箱")
     colors = choices(COLORS, k=len(TOOLS_CONFIG))
     for tool, color in zip(TOOLS_CONFIG, colors):
-        put_button(tool["name"], onclick=partial(go_app, tool["app"]), color=color)
+        put_button(label=tool["name"], onclick=partial(go_app, tool["app"]), color=color)
 
 
 def _create_tool_app(cls: type) -> Callable[[], None]:
@@ -73,7 +72,7 @@ if __name__ == "__main__":
 
     config(title="7086 工具箱", theme="minty")
     start_server(
-        apps,
+        applications=apps,
         cdn=True,
         auto_open_webbrowser=True,
         port=7086,

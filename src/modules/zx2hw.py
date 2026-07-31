@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 import re
 import time
@@ -78,7 +77,7 @@ class Zx2Hw:
         put_markdown("----")
         put_scope("output")
 
-    @use_scope("output", clear=True)
+    @use_scope(name="output", clear=True)
     def update(self):
         content = ""
         code = ""
@@ -175,7 +174,11 @@ class Zx2Hw:
         put_markdown(f"```text\n{content}\n```")
 
         day = time.strftime("%Y-%m-%d", time.localtime(time.time()))
-        put_file(f"{day}.txt", content.encode(), ">> 点击下载脚本 <<")
+        put_file(
+            name=f"{day}.txt",
+            content=content.encode(),
+            label=">> 点击下载脚本 <<",
+        )
 
 
 if __name__ == "__main__":

@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 import time
 
@@ -15,7 +14,7 @@ class Reversepolarity:
 
         put_markdown("# 反极性脚本生成器")
         put_textarea(
-            "numbers",
+            name="numbers",
             label="号码",
             placeholder="sippstnuser add 0/2/1 0 telno 8657588111111\nsippstnuser add 0/2/4 0 telno 8657588222222\n...",
             help_text="从 GPON 复制的数据（进 esl user，运行 disp cu），每行一个号码。",
@@ -27,7 +26,7 @@ class Reversepolarity:
         put_markdown("----")
         put_scope("output")
 
-    @use_scope("output", clear=True)
+    @use_scope(name="output", clear=True)
     def update(self):
         try:
             lines = [s.strip() for s in str(pin["numbers"]).strip().split("\n") if s.strip()]
@@ -45,7 +44,11 @@ class Reversepolarity:
             put_markdown(content)
 
             day = time.strftime("%Y-%m-%d", time.localtime())
-            put_file(f"{day}.txt", content.encode(), ">> 点击下载脚本 <<")
+            put_file(
+                name=f"{day}.txt",
+                content=content.encode(),
+                label=">> 点击下载脚本 <<",
+            )
 
         except IndexError:
             put_text("你得按照提示里的格式输入。")

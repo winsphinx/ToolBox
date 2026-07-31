@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 
 import datetime
@@ -35,9 +34,9 @@ class Pcdn:
         put_markdown("----")
         put_scope("output")
 
-    @use_scope("output", clear=True)
+    @use_scope(name="output", clear=True)
     def match_file(self):
-        with use_scope("output", clear=True):
+        with use_scope(name="output", clear=True):
             try:
                 with put_loading():
                     put_text("开始吭哧吭哧生成结果......")
@@ -134,7 +133,11 @@ class Pcdn:
                     output_buffer.seek(0)
                     content = output_buffer.getvalue()
 
-                put_file("output.xlsx", content, ">> 点击下载生成后的文件 <<")
+                put_file(
+                    name="output.xlsx",
+                    content=content,
+                    label=">> 点击下载生成后的文件 <<",
+                )
 
             except KeyError as e:
                 put_text(f"文件缺少必要列: {e}")

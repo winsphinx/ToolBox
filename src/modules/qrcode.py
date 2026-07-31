@@ -1,10 +1,8 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 import time
 import zipfile
 from io import BytesIO
-from typing import List
 
 from PIL import Image
 from pywebio.output import put_button, put_file, put_loading, put_markdown, put_scope, use_scope
@@ -21,8 +19,8 @@ MARGIN_X, MARGIN_Y = 50, 70
 SPACING_X, SPACING_Y = 500, 383
 
 
-def put_picture(png_data_list: List[BytesIO]) -> List[BytesIO]:
-    output_buffers: List[BytesIO] = []
+def put_picture(png_data_list):
+    output_buffers = []
     w = int(A4_WIDTH_MM * DPI / 25.4)
     h = int(A4_HEIGHT_MM * DPI / 25.4)
     qr_w = int(QR_WIDTH_MM * DPI / 25.4)
@@ -50,7 +48,7 @@ def put_picture(png_data_list: List[BytesIO]) -> List[BytesIO]:
 
 
 class QRCode:
-    def __init__(self) -> None:
+    def __init__(self):
         display_random_pet()
         put_markdown("# 码化之二维码生成工具")
         put_file_upload(
@@ -63,16 +61,16 @@ class QRCode:
         put_markdown("----")
         put_scope("output")
 
-    @use_scope("output", clear=True)
-    def make_file(self) -> None:
-        output_zip_buffer: BytesIO | None = None
-        content: str = ""
+    @use_scope(name="output", clear=True)
+    def make_file(self):
+        output_zip_buffer = None
+        content = ""
 
         with put_loading():
             try:
                 input_zip_content = pin["zip_file"]["content"]
                 input_zip_buffer = BytesIO(input_zip_content)
-                png_data_list: List[BytesIO] = []
+                png_data_list = []
 
                 with zipfile.ZipFile(input_zip_buffer, "r") as zf:
                     for filename in zf.namelist():
@@ -98,7 +96,11 @@ class QRCode:
 
         if output_zip_buffer:
             filename = f"QRCode-{time.strftime('%Y%m%d%H%M', time.localtime())}.zip"
-            put_file(filename, output_zip_buffer.getvalue(), ">> 点击下载生成后的文件 <<")
+            put_file(
+                name=filename,
+                content=output_zip_buffer.getvalue(),
+                label=">> 点击下载生成后的文件 <<",
+            )
         else:
             put_markdown(content)
 

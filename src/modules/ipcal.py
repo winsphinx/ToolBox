@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 import ipaddress
 
@@ -15,13 +14,13 @@ class IPcal:
 
         put_markdown("# IP 地址计算器")
         put_input(
-            "ip",
+            name="ip",
             label="IP 地址",
             placeholder="192.168.0.1/24",
             help_text="输入 IP 地址，如 10.0.1.0/255.255.255.252，或 10.0.1.0/30，或 ::1/126。",
         )
         put_input(
-            "ip2",
+            name="ip2",
             label="要挖掉的 IP 地址",
             placeholder="192.168.0.10/25",
             help_text="用不到留空。格式同上。",
@@ -33,7 +32,7 @@ class IPcal:
         put_markdown("----")
         put_scope("output")
 
-    @use_scope("output", clear=True)
+    @use_scope(name="output", clear=True)
     def update(self):
         try:
             interface = ipaddress.ip_interface(pin["ip"])
