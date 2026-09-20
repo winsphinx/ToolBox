@@ -70,7 +70,11 @@ if __name__ == "__main__":
     apps: dict[str, Callable[[], None]] = {tool["app"]: _create_tool_app(tool["cls"]) for tool in TOOLS_CONFIG}
     apps["index"] = create_app_index
 
-    config(title="7086 工具箱", theme="minty")
+    config(
+        title="7086 工具箱",
+        theme="minty",
+        css_style="footer.footer { display: none !important; }",
+    )
     start_server(
         applications=apps,
         cdn=True,
