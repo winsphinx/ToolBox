@@ -56,7 +56,7 @@ TOOLS_CONFIG: list[ToolConfig] = [
 def create_app_index() -> None:
     display_random_pet()
 
-    put_markdown("# 七零八落工具箱")
+    put_markdown("# 七零八落工具集")
     colors = choices(COLORS, k=len(TOOLS_CONFIG))
     for tool, color in zip(TOOLS_CONFIG, colors):
         put_button(label=tool["name"], onclick=partial(go_app, tool["app"]), color=color)
@@ -71,7 +71,7 @@ if __name__ == "__main__":
     apps["index"] = create_app_index
 
     config(
-        title="7086 工具箱",
+        title="7086 工具集",
         theme="minty",
         css_style="footer.footer { display: none !important; }",
     )
