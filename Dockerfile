@@ -1,4 +1,4 @@
-FROM python:alpine AS builder
+FROM python:3.14-alpine AS builder
 
 ENV UV_COMPILE_BYTECODE=1 \
     UV_LINK_MODE=copy \
@@ -13,7 +13,7 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
 RUN uv sync --frozen --no-dev
 
 
-FROM python:alpine
+FROM python:3.14-alpine
 
 WORKDIR /app
 
