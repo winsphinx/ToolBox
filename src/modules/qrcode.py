@@ -1,12 +1,14 @@
 #!/usr/bin/env python
 
+import secrets
 import time
 import zipfile
 from io import BytesIO
 
+import qrcode
 from PIL import Image
 from pywebio.output import put_button, put_file, put_loading, put_markdown, put_scope, use_scope
-from pywebio.pin import pin, put_file_upload
+from pywebio.pin import pin, put_file_upload, put_input
 
 from utils import display_random_pet
 
@@ -47,17 +49,43 @@ def put_picture(png_data_list):
     return output_buffers
 
 
+def make_qrcode_png(text):
+    qr = qrcode.QRCode(box_size=10, border=4)
+    qr.add_data(text)
+    qr.make(fit=True)
+    image = qr.make_image(fill_color="black", back_color="white")
+
+    output_buffer = BytesIO()
+    image.save(output_buffer, format="PNG")
+    output_buffer.seek(0)
+
+    return output_buffer
+
+
 class QRCode:
     def __init__(self):
         display_random_pet()
         put_markdown("# 码化之二维码生成工具")
+
+        put_markdown("### 生成二维码")
+        put_input(
+            name="qr_count",
+            type="number",
+            label="输入要生成的二维码数量，默认 1000",
+            value=1000,
+        )
+        put_button(label="开始生成二维码", onclick=self.make_qrcode_zip)
+        put_markdown("----")
+        put_scope("random_output")
+
+        put_markdown("### 排版用于打印")
         put_file_upload(
             name="zip_file",
             label="上传二维码打包文件",
             accept=".zip",
             placeholder="将多个 png 格式的二维码文件，打包成一个 zip 文件。",
         )
-        put_button(label="开始生成文件", onclick=self.make_file)
+        put_button(label="开始生成打印版文件", onclick=self.make_file)
         put_markdown("----")
         put_scope("output")
 
@@ -100,6 +128,40 @@ class QRCode:
                 name=filename,
                 content=output_zip_buffer.getvalue(),
                 label=">> 点击下载生成后的文件 <<",
+            )
+        else:
+            put_markdown(content)
+
+    @use_scope(name="random_output", clear=True)
+    def make_qrcode_zip(self):
+        output_zip_buffer = None
+        content = ""
+
+        with put_loading():
+            try:
+                qr_count = int(pin["qr_count"])
+                if qr_count <= 0:
+                    raise ValueError
+
+                output_zip_buffer = BytesIO()
+
+                with zipfile.ZipFile(output_zip_buffer, "w", zipfile.ZIP_DEFLATED) as zf_out:
+                    for _ in range(qr_count):
+                        hex_str = secrets.token_hex(32)
+                        png_buffer = make_qrcode_png(hex_str)
+                        zf_out.writestr(f"{hex_str}.png", png_buffer.getvalue())
+
+                output_zip_buffer.seek(0)
+
+            except TypeError, ValueError:
+                content = "请输入正确的生成张数！"
+
+        if output_zip_buffer:
+            filename = f"QRCode-{time.strftime('%Y%m%d%H%M', time.localtime())}.zip"
+            put_file(
+                name=filename,
+                content=output_zip_buffer.getvalue(),
+                label=">> 点击下载生成的二维码文件 <<",
             )
         else:
             put_markdown(content)
