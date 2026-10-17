@@ -58,15 +58,18 @@ class Zx2Hw:
         display_random_pet()
 
         put_markdown("# ZX 转 HW 专线脚本生成器")
+
+        put_markdown("### 方式一 —— 命令模式")
         put_textarea(
             name="code",
             label="在下面文本框中粘贴 ZX 脚本内容，以 $ 作为分割。",
             placeholder="interface smartgroup...\n.....\n.....\n.....\n$",
             rows=12,
         )
+        put_markdown("### 方式二 —— 脚本模式")
         put_file_upload(
             name="code_file",
-            label="或者，直接上传脚本文件",
+            label="直接上传脚本文件",
             accept=".txt",
             placeholder="上传 ZX 配置文件",
         )

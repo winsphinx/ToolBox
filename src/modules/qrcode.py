@@ -56,7 +56,7 @@ def make_qrcode_png(text):
     image = qr.make_image(fill_color="black", back_color="white")
 
     output_buffer = BytesIO()
-    image.save(output_buffer, format="PNG")
+    image.save(output_buffer, kind="PNG")
     output_buffer.seek(0)
 
     return output_buffer
@@ -72,7 +72,7 @@ class QRCode:
             name="qr_count",
             type="number",
             label="输入要生成的二维码数量，默认 1000",
-            value=1000,
+            value="1000",
         )
         put_button(label="开始生成二维码", onclick=self.make_qrcode_zip)
         put_markdown("----")
