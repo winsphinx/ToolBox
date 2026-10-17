@@ -67,7 +67,7 @@ class QRCode:
         display_random_pet()
         put_markdown("# 码化之二维码生成工具")
 
-        put_markdown("### 生成二维码")
+        put_markdown("### 生成二维码（单张版）")
         put_input(
             name="qr_count",
             type="number",
@@ -78,7 +78,7 @@ class QRCode:
         put_markdown("----")
         put_scope("random_output")
 
-        put_markdown("### 排版用于打印")
+        put_markdown("### 排版二维码（打印版）")
         put_file_upload(
             name="zip_file",
             label="上传二维码打包文件",
