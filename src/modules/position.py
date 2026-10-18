@@ -38,12 +38,16 @@ class Position:
                 put_text("请输入有效的 IP 地址")
                 return
 
-            url = "https://ip-api.com/batch?lang=zh-CN"
+            url = "http://ip-api.com/batch"
+            params = {"lang": "zh-CN", "fields": "status,message,query,country,regionName,city,lat,lon"}
             results = []
             try:
                 # 免费版 batch 接口单次最多 100 个 IP，超量会被 422
                 for i in range(0, len(ips), 100):
-                    response = requests.post(url, json=ips[i : i + 100], timeout=10)
+                    response = requests.post(url, params=params, json=ips[i : i + 100], timeout=30)
+                    if response.status_code == 429:
+                        put_text("请求太频繁被限流了，等五分钟再试。")
+                        return
                     response.raise_for_status()
                     for data in response.json():
                         if data.get("status") == "success":
@@ -51,7 +55,9 @@ class Position:
                             lat = f"{'北纬' if data['lat'] >= 0 else '南纬'}{abs(data['lat'])}°"
                             results.append(f"IP: {data['query']} → {data['country']} {data['regionName']} {data['city']} ({lon}, {lat})")
                         else:
-                            results.append(f"IP: {data.get('query', 'unknown')} → 无法获取")
+                            reason = data.get("message") or "无法获取"
+                            results.append(f"IP: {data.get('query', 'unknown')} → {reason}")
+
             except requests.exceptions.RequestException as e:
                 put_text(f"请求失败: {e}")
                 return
@@ -59,7 +65,7 @@ class Position:
                 put_text(f"解析响应失败: {e}")
                 return
 
-            put_text("\n".join(results))
+        put_text("\n".join(results))
 
 
 if __name__ == "__main__":
