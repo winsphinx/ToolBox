@@ -31,6 +31,13 @@ CTG_DTG_DEL = "LOCPFX"
 CTG_CTG_ADD = 'SETUPACK"&"ANNOUNCEMENT'
 
 
+def _split_pair(value, label: str) -> tuple[str, str]:
+    parts = [s.strip() for s in str(value).strip().split("/")]
+    if len(parts) != 2 or not all(parts):
+        raise ValueError(f"“{label}”需为“5xxx/5xxx”格式，中间用 / 隔开。")
+    return parts[0], parts[1]
+
+
 def build_summary(mode, name, ip, pool, nexthop, ra1, ra2, cac, max, mgcf, isbc, adj, node, br1, br2, link, tg, auth, sub_numbers):
     lines = [
         f"名称：{name}",
@@ -352,22 +359,31 @@ class Sipcall:
 
     @use_scope(name="output", clear=True)
     def update(self):
+        try:
+            ra1, ra2 = _split_pair(pin["routes"], "route analyser")
+            br1, br2 = _split_pair(pin["brs"], "连接编号")
+        except ValueError as e:
+            put_text(f"输入格式错误：{e}")
+            return
+        try:
+            max = int(str(pin["max"]).strip())
+        except TypeError, ValueError:
+            put_text("输入格式错误：“并发数”必须是数字。")
+            return
+
         with put_loading():
             put_text("开始生成脚本...")
-            mode = pin["mode"]
-            isbc_number = pin["isbc_number"]
+            mode = str(pin["mode"]).strip()
+            isbc_number = str(pin["isbc_number"]).strip()
             name = str(pin["name"]).strip()
             ip = str(pin["IP"]).strip()
             pool = str(pin["pool"]).strip()
             nexthop = str(pin["nexthop"]).strip()
-            ra1, ra2 = str(pin["routes"]).strip().split("/")
             cac = str(pin["cac"]).strip()
-            max = int(str(pin["max"]).strip())
             mgcf = str(pin["mgcf"]).strip()
             isbc = str(pin["isbc"]).strip()
             adj = str(pin["adj"]).strip()
             node = str(pin["node"]).strip()
-            br1, br2 = str(pin["brs"]).strip().split("/")
             link = str(pin["link"]).strip()
             tg = str(pin["tg"]).strip()
             auth = str(pin["auth"]).strip()

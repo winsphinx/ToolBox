@@ -10,13 +10,7 @@ on:
 
 jobs:
   check:
-    name: ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os:
-          - ubuntu-latest
-          - windows-latest
+    runs-on: ubuntu-24.04
 
     steps:
     - uses: actions/checkout@v7
@@ -26,11 +20,8 @@ jobs:
       with:
         python-version: '3.x'
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install flake8
+    - name: Install ruff
+      run:  pip install ruff
 
-    - name: Lint with flake8
-      run:
-        flake8 . --count --max-complexity=25 --max-line-length=1080 --statistics --ignore=E203
+    - name: Lint with ruff
+      run: ruff check .

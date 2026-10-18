@@ -37,26 +37,26 @@ class Position:
                 put_text("请输入有效的 IP 地址")
                 return
 
-            url = "http://ip-api.com/batch?lang=zh-CN"
+            url = "https://ip-api.com/batch?lang=zh-CN"
+            results = []
             try:
-                response = requests.post(url, json=ips, timeout=10)
-                response.raise_for_status()
-                total_data = response.json()
+                # 免费版 batch 接口单次最多 100 个 IP，超量会被 422
+                for i in range(0, len(ips), 100):
+                    response = requests.post(url, json=ips[i : i + 100], timeout=10)
+                    response.raise_for_status()
+                    for data in response.json():
+                        if data.get("status") == "success":
+                            lon = f"{'东经' if data['lon'] >= 0 else '西经'}{abs(data['lon'])}°"
+                            lat = f"{'北纬' if data['lat'] >= 0 else '南纬'}{abs(data['lat'])}°"
+                            results.append(f"IP: {data['query']} → {data['country']} {data['regionName']} {data['city']} ({lon}, {lat})")
+                        else:
+                            results.append(f"IP: {data.get('query', 'unknown')} → 无法获取")
             except requests.exceptions.RequestException as e:
                 put_text(f"请求失败: {e}")
                 return
             except (ValueError, KeyError) as e:
                 put_text(f"解析响应失败: {e}")
                 return
-
-            results = []
-            for data in total_data:
-                if data.get("status") == "success":
-                    lon = f"{'东经' if data['lon'] >= 0 else '西经'}{abs(data['lon'])}°"
-                    lat = f"{'北纬' if data['lat'] >= 0 else '南纬'}{abs(data['lat'])}°"
-                    results.append(f"IP: {data['query']} → {data['country']} {data['regionName']} {data['city']} ({lon}, {lat})")
-                else:
-                    results.append(f"IP: {data.get('query', 'unknown')} → 无法获取")
 
             put_text("\n".join(results))
 
