@@ -28,11 +28,12 @@ class Position:
     @use_scope(name="output", clear=True)
     def update(self):
         with put_loading():
-            if not pin["ip"] or not pin["ip"].strip():
+            ip_text = str(pin["ip"] or "")
+            if not ip_text.strip():
                 put_text("请输入 IP 地址")
                 return
 
-            ips = [s.strip() for s in pin["ip"].strip().split("\n") if s.strip()]
+            ips = [s.strip() for s in ip_text.strip().split("\n") if s.strip()]
             if not ips:
                 put_text("请输入有效的 IP 地址")
                 return

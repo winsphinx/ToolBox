@@ -64,13 +64,13 @@ USER_TEMPLATE = """vbui-configuration
 """
 
 
-def smart_decode(content):
+def smart_decode(content) -> str:
     for charset in ["utf-8-sig", "utf-8", "utf-16"]:
         try:
             return content.decode(charset)
         except UnicodeDecodeError:
             continue
-    return content
+    return content.decode("utf-8", errors="replace")
 
 
 class Hw2Zx:
@@ -105,7 +105,7 @@ class Hw2Zx:
         content = ""
         params = []
         if pin["code"]:
-            code = pin["code"]
+            code = str(pin["code"])
         elif pin["code_file"]:
             code = smart_decode(pin["code_file"]["content"])
         else:

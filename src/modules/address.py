@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
+import os
 import time
+from typing import Any
 
 import requests
 from pywebio.output import put_button, put_markdown, put_progressbar, put_row, put_scope, put_table, put_text, set_progressbar, use_scope
@@ -8,7 +10,7 @@ from pywebio.pin import pin, put_textarea
 
 from utils import display_random_pet
 
-KEY = "3252a68ab8715c2d869ffc388d9ce580"
+KEY = os.environ.get("AMAP_KEY", "")
 
 
 def _parse_input(text: str) -> list[str]:
@@ -58,7 +60,7 @@ class Address:
     def query_address(self):
         try:
             addresses = _parse_input(str(pin["address"]))
-            content = [["地址", "经度", "纬度"]]
+            content: list[Any] = [["地址", "经度", "纬度"]]
             total = len(addresses)
             put_progressbar("bar")
 
@@ -86,7 +88,7 @@ class Address:
     def query_location(self):
         try:
             locations = _parse_input(str(pin["address"]))
-            content = [["经度", "纬度", "地址"]]
+            content: list[Any] = [["经度", "纬度", "地址"]]
             total = len(locations)
             put_progressbar("bar")
 

@@ -59,7 +59,7 @@ class AddIMS:
         telnos = [s.strip() for s in str(pin["telnos"]).strip().split("\n") if s.strip()]
         passwd = str(pin["passwd"]).strip()
         ports = [s.strip() for s in str(pin["ports"]).strip().split("\n") if s.strip()]
-        area = pin["area"]
+        area = str(pin["area"])
 
         if not all([telnos, passwd, ports]):
             raise ValueError("号码、密码和端口为必填项。")

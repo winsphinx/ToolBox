@@ -1,10 +1,21 @@
 #!/usr/bin/env python
 
+import os
+from typing import Any
+
 import requests
 from pywebio.output import put_button, put_markdown, put_scope, put_table, use_scope
 from pywebio.pin import pin, put_input
 
 from utils import display_random_pet
+
+AMAP_KEY = os.environ.get("AMAP_KEY", "")
+
+
+def _amap_get(url: str, params: dict, timeout: int = 10) -> dict:
+    resp = requests.get(url, params=params, timeout=timeout)
+    resp.raise_for_status()
+    return resp.json()
 
 
 class Location:
@@ -38,15 +49,21 @@ class Location:
 
     @use_scope(name="output", clear=True)
     def update(self):
-        content = [["名称", "地址", "区县", "城市"]]
+        content: list[Any] = [["名称", "地址", "区县", "城市"]]
         keyword = str(pin["keyword"]).strip()
         location = str(pin["location"]).strip()
         radius = str(pin["radius"]).strip()
 
-        KEY = "3252a68ab8715c2d869ffc388d9ce580"
-        url = f"https://restapi.amap.com/v3/place/around?key={KEY}&location={location}&keywords={keyword}&radius={radius}&output=json"
-        response = requests.get(url)
-        data = response.json()
+        data = _amap_get(
+            "https://restapi.amap.com/v3/place/around",
+            {
+                "key": AMAP_KEY,
+                "location": location,
+                "keywords": keyword,
+                "radius": radius,
+                "output": "json",
+            },
+        )
 
         if data["status"] == "1":
             for poi in data["pois"]:

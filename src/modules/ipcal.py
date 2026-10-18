@@ -35,7 +35,7 @@ class IPcal:
     @use_scope(name="output", clear=True)
     def update(self):
         try:
-            interface = ipaddress.ip_interface(pin["ip"])
+            interface = ipaddress.ip_interface(str(pin["ip"]))
             network = interface.network
             context = [f"它的网络地址是：{interface.network}"]
 
@@ -68,7 +68,11 @@ class IPcal:
                 context.append(f"它的可用地址有：\n{hosts}")
 
             if pin["ip2"]:
-                excluded = ipaddress.ip_interface(pin["ip2"]).network
+                excluded = ipaddress.ip_interface(str(pin["ip2"])).network
+                if network.version != excluded.version:
+                    put_text("IP 版本不一致，无法相减。")
+                    return
+
                 remaining = [str(n) for n in network.address_exclude(excluded)]
                 context.append(f"\n从 {network} 里抠掉 {excluded} 后，留下的网络是：\n{remaining}")
 

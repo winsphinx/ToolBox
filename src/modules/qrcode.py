@@ -139,7 +139,7 @@ class QRCode:
 
         with put_loading():
             try:
-                qr_count = int(pin["qr_count"])
+                qr_count = int(str(pin["qr_count"]))
                 if qr_count <= 0:
                     raise ValueError
 
