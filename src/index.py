@@ -9,6 +9,7 @@ from pywebio import config, start_server
 from pywebio.output import put_button, put_markdown
 from pywebio.session import go_app
 
+from modules.acdn import Acdn
 from modules.addims import AddIMS
 from modules.address import Address
 from modules.callgroup import Callgroup
@@ -50,6 +51,7 @@ TOOLS_CONFIG: list[ToolConfig] = [
     {"name": "HW 转 ZX 专线脚本生成器", "app": "hw2zx", "cls": Hw2Zx},
     {"name": "ZX 转 HW 专线脚本生成器", "app": "zx2hw", "cls": Zx2Hw},
     {"name": "PCDN 分析工具", "app": "pcdn", "cls": Pcdn},
+    {"name": "ACDN 分析工具", "app": "acdn", "cls": Acdn},
 ]
 
 
